@@ -1,0 +1,1176 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#173f35" />
+    <meta
+      name="description"
+      content="Mobile-friendly semi-structured questionnaire for the SCALA corn and livestock supply-chain field consultation."
+    />
+    <title>SCALA Farmer Survey · Thailand</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#survey-form">Skip to questionnaire</a>
+
+    <header class="site-header">
+      <div class="brand-lockup">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48" role="img">
+            <path d="M24 42C14 34 10 25 12 15c8 1 14 5 17 12 1-8 5-14 12-18 3 14-3 26-17 33Z" />
+            <path d="M15 19c6 4 10 9 12 16M35 16c-3 7-7 13-12 18" />
+          </svg>
+        </span>
+        <span>
+          <strong>SCALA · Thailand</strong>
+          <small>Corn &amp; livestock field consultation</small>
+        </span>
+      </div>
+      <div class="connection-status" id="connection-status" role="status">
+        <span class="status-dot" aria-hidden="true"></span>
+        <span>Checking connection…</span>
+      </div>
+    </header>
+
+    <main class="page-shell">
+      <aside class="survey-rail" aria-label="Survey progress">
+        <p class="eyebrow">Your progress</p>
+        <div class="progress-number"><span id="progress-percent">0</span><span>%</span></div>
+        <div
+          class="progress-track"
+          id="progress-track"
+          role="progressbar"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+          aria-label="Questionnaire progress"
+        >
+          <span id="progress-bar"></span>
+        </div>
+        <p class="progress-label" id="progress-label">Welcome &amp; consent</p>
+        <ol class="step-list" id="step-list"></ol>
+        <div class="draft-state" id="draft-state" role="status">Draft is saved on this device.</div>
+        <button class="text-button" id="clear-draft" type="button">Clear saved draft</button>
+      </aside>
+
+      <div class="survey-column">
+        <noscript>
+          <div class="alert alert-error">This questionnaire needs JavaScript enabled in your browser.</div>
+        </noscript>
+
+        <div class="mobile-progress" aria-hidden="true">
+          <span id="mobile-step-label">Step 1</span>
+          <span id="mobile-progress-percent">0%</span>
+          <span class="mobile-progress-bar"><span id="mobile-progress-fill"></span></span>
+        </div>
+
+        <div class="error-summary" id="error-summary" role="alert" tabindex="-1" hidden></div>
+
+        <form id="survey-form" novalidate>
+          <section class="form-step is-active" data-step="welcome" data-title="Welcome &amp; consent">
+            <div class="hero-card">
+              <div class="hero-copy">
+                <p class="eyebrow">Semi-structured questionnaire</p>
+                <h1>Help us understand farming, climate risks, and local solutions.</h1>
+                <p class="hero-intro">
+                  This interview covers corn and livestock production, past climate losses, and the support farmers need.
+                  It normally takes <strong>45–60 minutes</strong>.
+                </p>
+                <div class="hero-pills" aria-label="Questionnaire features">
+                  <span>Mobile friendly</span>
+                  <span>Draft autosave</span>
+                  <span>Skip questions</span>
+                </div>
+              </div>
+              <div class="hero-art" aria-hidden="true">
+                <span class="sun"></span>
+                <span class="field field-one"></span>
+                <span class="field field-two"></span>
+                <span class="field field-three"></span>
+                <svg viewBox="0 0 240 220">
+                  <path d="M17 164c37-14 65-9 86 13 25-43 62-55 111-37v64H17Z" />
+                  <path d="M67 168c6-37 19-68 40-93 1 42-8 76-27 103M118 161c19-41 45-68 78-81-13 41-37 72-70 93" />
+                  <path d="M91 109c-13-4-23-13-29-27 17-1 31 6 42 20M145 119c2-18 12-31 31-41 2 19-6 35-25 48" />
+                </svg>
+              </div>
+            </div>
+
+            <div class="principles-grid">
+              <article>
+                <span>01</span>
+                <h2>Voluntary</h2>
+                <p>You may skip any question or stop the interview at any time without consequences.</p>
+              </article>
+              <article>
+                <span>02</span>
+                <h2>Confidential</h2>
+                <p>Answers should be analysed in aggregate. Names are not requested in this form.</p>
+              </article>
+              <article>
+                <span>03</span>
+                <h2>Experience-led</h2>
+                <p>There are no right or wrong answers. We are interested in your experience and views.</p>
+              </article>
+            </div>
+
+            <div class="section-heading">
+              <span>Before we begin</span>
+              <h2>Interview details</h2>
+              <p>Fields marked “Required” are needed to register a response. All other questions are optional.</p>
+            </div>
+
+            <div class="form-grid two-columns">
+              <label class="field-card">
+                <span>Participant ID <em>Required</em></span>
+                <small>Use a project code, not the participant’s name.</small>
+                <input name="meta.participant_id" type="text" autocomplete="off" maxlength="80" required />
+              </label>
+              <label class="field-card">
+                <span>Interview date <em>Required</em></span>
+                <input name="meta.date" id="interview-date" type="date" required />
+              </label>
+              <label class="field-card full-width">
+                <span>Interview location <em>Required</em></span>
+                <small>Village, district, province, or another agreed field-site label.</small>
+                <input name="meta.location" type="text" autocomplete="off" maxlength="200" required />
+              </label>
+            </div>
+
+            <fieldset class="question-card consent-card">
+              <legend>Informed consent <span class="required-badge">Required</span></legend>
+              <label class="choice-row choice-row-prominent">
+                <input
+                  name="meta.consent"
+                  type="checkbox"
+                  value="I confirm my participation in this interview."
+                  required
+                />
+                <span>
+                  <strong>I have been informed about this interview and consent to participate.</strong>
+                  <small>I understand that participation is voluntary and that I may skip questions.</small>
+                </span>
+              </label>
+            </fieldset>
+
+            <div class="source-note">
+              <span aria-hidden="true">↗</span>
+              <p>
+                Prefer the paper version? <a href="source/EN_Semi_structured_questionnaire_1Sep.docx">Download the source questionnaire</a>.
+              </p>
+            </div>
+          </section>
+
+          <section class="form-step" data-step="general" data-title="General information">
+            <div class="section-heading">
+              <span>Section 1</span>
+              <h2>General information</h2>
+              <p>Basic household and farming context. You may leave any non-required answer blank.</p>
+            </div>
+
+            <fieldset class="question-card">
+              <legend><b>D1.</b> Age group</legend>
+              <div class="choice-grid five-up">
+                <label><input name="d.age" type="radio" value="18–29 years" /><span>18–29</span></label>
+                <label><input name="d.age" type="radio" value="30–39 years" /><span>30–39</span></label>
+                <label><input name="d.age" type="radio" value="40–49 years" /><span>40–49</span></label>
+                <label><input name="d.age" type="radio" value="50–59 years" /><span>50–59</span></label>
+                <label><input name="d.age" type="radio" value="60 years and above" /><span>60+</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>D2.</b> Gender</legend>
+              <div class="choice-grid four-up">
+                <label><input name="d.gender" type="radio" value="Male" /><span>Male</span></label>
+                <label><input name="d.gender" type="radio" value="Female" /><span>Female</span></label>
+                <label><input name="d.gender" type="radio" value="Other" /><span>Other</span></label>
+                <label><input name="d.gender" type="radio" value="Prefer not to say" /><span>Prefer not to say</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>D3.</b> Main occupation</legend>
+              <p class="question-help">Choose the closest match.</p>
+              <div class="choice-list">
+                <label><input name="d.occupation" type="radio" value="Maize or crop farmer" /><span>Maize or crop farmer</span></label>
+                <label><input name="d.occupation" type="radio" value="Livestock farmer" /><span>Livestock farmer</span></label>
+                <label><input name="d.occupation" type="radio" value="Mixed crop and livestock farmer" /><span>Mixed crop and livestock farmer</span></label>
+                <label><input name="d.occupation" type="radio" value="Other" data-controls="d-occupation-other" /><span>Other</span></label>
+              </div>
+              <label class="inline-detail conditional" id="d-occupation-other" hidden>
+                <span>Please specify</span>
+                <input name="d.occupation_other" type="text" maxlength="160" />
+              </label>
+            </fieldset>
+
+            <fieldset class="question-card route-card" data-required-group="d.modules">
+              <legend>Which production sections apply? <span class="required-badge">Required</span></legend>
+              <p class="question-help">We use this answer only to show the relevant corn and livestock questions. You can change the suggested selection.</p>
+              <div class="choice-list" id="module-choices">
+                <label><input name="d.modules" type="checkbox" value="maize" /><span>Feed corn / maize production</span></label>
+                <label><input name="d.modules" type="checkbox" value="livestock" /><span>Livestock production</span></label>
+                <label><input name="d.modules" type="checkbox" value="none" data-exclusive="true" /><span>Neither / not sure</span></label>
+              </div>
+              <p class="route-message" id="route-message" aria-live="polite"></p>
+            </fieldset>
+
+            <div class="form-grid two-columns">
+              <label class="field-card">
+                <span><b>D4.</b> Supplementary occupation, if any</span>
+                <input name="d.supplementary_occupation" type="text" maxlength="200" />
+              </label>
+              <label class="field-card">
+                <span><b>D5.</b> Years working in agriculture</span>
+                <input name="d.farming_years" type="number" inputmode="numeric" min="0" max="90" />
+              </label>
+            </div>
+
+            <fieldset class="question-card">
+              <legend><b>D6.</b> Highest education level</legend>
+              <div class="choice-grid five-up">
+                <label><input name="d.education" type="radio" value="No formal schooling" /><span>No formal schooling</span></label>
+                <label><input name="d.education" type="radio" value="Primary" /><span>Primary</span></label>
+                <label><input name="d.education" type="radio" value="Secondary" /><span>Secondary</span></label>
+                <label><input name="d.education" type="radio" value="Vocational" /><span>Vocational</span></label>
+                <label><input name="d.education" type="radio" value="Bachelor's degree or higher" /><span>Bachelor’s or higher</span></label>
+              </div>
+            </fieldset>
+
+            <label class="field-card">
+              <span><b>D7.</b> Race / ethnic group</span>
+              <small>This sensitive question is optional. The participant may decline to answer.</small>
+              <input name="d.ethnicity" type="text" maxlength="160" />
+            </label>
+
+            <fieldset class="question-card">
+              <legend><b>D8.</b> Household members</legend>
+              <div class="form-grid three-columns">
+                <label class="compact-field"><span>All members</span><input name="d.household_total" type="number" min="0" max="99" inputmode="numeric" /></label>
+                <label class="compact-field"><span>Working on the farm</span><input name="d.household_farm_workers" type="number" min="0" max="99" inputmode="numeric" /></label>
+                <label class="compact-field"><span>Full-time farm workers</span><input name="d.household_fulltime" type="number" min="0" max="99" inputmode="numeric" /></label>
+              </div>
+              <p class="field-warning" id="household-warning" role="status"></p>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>D9.</b> Nature of land ownership <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns">
+                <label><input name="d.land_tenure" type="checkbox" value="Self-owned" /><span>Self-owned</span></label>
+                <label><input name="d.land_tenure" type="checkbox" value="Leased" /><span>Leased</span></label>
+                <label><input name="d.land_tenure" type="checkbox" value="Mortgaged or borrowed" /><span>Mortgaged or borrowed</span></label>
+                <label><input name="d.land_tenure" type="checkbox" value="Allocated land (MPA / cooperative estate)" /><span>Allocated land (MPA / cooperative estate)</span></label>
+                <label><input name="d.land_tenure" type="checkbox" value="Other" data-controls="d-land-other" /><span>Other</span></label>
+              </div>
+              <label class="inline-detail conditional" id="d-land-other" hidden><span>Please specify</span><input name="d.land_tenure_other" type="text" maxlength="160" /></label>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>D10.</b> Farm financial status in the past year</legend>
+              <div class="choice-grid five-up">
+                <label><input name="d.financial_status" type="radio" value="Profit" /><span>Profit</span></label>
+                <label><input name="d.financial_status" type="radio" value="Break-even" /><span>Break-even</span></label>
+                <label><input name="d.financial_status" type="radio" value="Loss or debt" /><span>Loss or debt</span></label>
+                <label><input name="d.financial_status" type="radio" value="Unknown" /><span>Unknown</span></label>
+                <label><input name="d.financial_status" type="radio" value="Prefer not to say" /><span>Prefer not to say</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>D11.</b> Share of household income from agriculture</legend>
+              <div class="choice-grid four-up">
+                <label><input name="d.agricultural_income_share" type="radio" value="Less than 25%" /><span>&lt;25%</span></label>
+                <label><input name="d.agricultural_income_share" type="radio" value="25–50%" /><span>25–50%</span></label>
+                <label><input name="d.agricultural_income_share" type="radio" value="51–75%" /><span>51–75%</span></label>
+                <label><input name="d.agricultural_income_share" type="radio" value="More than 75%" /><span>&gt;75%</span></label>
+              </div>
+            </fieldset>
+
+            <div class="rating-matrix" data-matrix="financialStability"></div>
+          </section>
+
+          <section class="form-step" data-step="community" data-title="Community">
+            <div class="section-heading">
+              <span>Section 2</span>
+              <h2>Your community</h2>
+              <p>Local livelihoods, organizations, information access, and preparedness.</p>
+            </div>
+
+            <fieldset class="question-card">
+              <legend><b>C1.</b> Location</legend>
+              <div class="form-grid two-columns">
+                <label class="compact-field"><span>Province</span><input name="c.province" type="text" maxlength="100" /></label>
+                <label class="compact-field"><span>District</span><input name="c.district" type="text" maxlength="100" /></label>
+                <label class="compact-field"><span>Subdistrict</span><input name="c.subdistrict" type="text" maxlength="100" /></label>
+                <label class="compact-field"><span>Village</span><input name="c.village" type="text" maxlength="100" /></label>
+              </div>
+            </fieldset>
+
+            <label class="field-card">
+              <span><b>C2.</b> What are the main agricultural activities in your community?</span>
+              <textarea name="c.main_agricultural_activities" rows="4" maxlength="1500"></textarea>
+            </label>
+            <label class="field-card">
+              <span><b>C3.</b> What other non-agricultural economic activities take place in the community?</span>
+              <textarea name="c.non_agricultural_activities" rows="4" maxlength="1500"></textarea>
+            </label>
+
+            <fieldset class="question-card" id="community-groups">
+              <legend><b>C4.</b> Community groups or organizations <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns exclusive-group">
+                <label><input name="c.memberships" type="checkbox" value="Agricultural cooperative" /><span>Agricultural cooperative</span></label>
+                <label><input name="c.memberships" type="checkbox" value="Community enterprise group" /><span>Community enterprise group</span></label>
+                <label><input name="c.memberships" type="checkbox" value="Water-user group" /><span>Water-user group</span></label>
+                <label><input name="c.memberships" type="checkbox" value="Village fund" /><span>Village fund</span></label>
+                <label><input name="c.memberships" type="checkbox" value="Not a member" data-exclusive="true" /><span>Not a member of any group</span></label>
+                <label><input name="c.memberships" type="checkbox" value="Other" data-controls="c-membership-other" /><span>Other</span></label>
+              </div>
+              <label class="inline-detail conditional" id="c-membership-other" hidden><span>Please specify</span><input name="c.membership_other" type="text" maxlength="160" /></label>
+            </fieldset>
+
+            <div class="rating-matrix" data-matrix="communityStatements"></div>
+          </section>
+
+          <section class="form-step" data-step="hopes" data-title="Hopes &amp; concerns">
+            <div class="section-heading">
+              <span>Section 3</span>
+              <h2>Hopes and concerns</h2>
+              <p>Looking ten years ahead for the farm, family, and community.</p>
+            </div>
+
+            <div class="paired-ranking">
+              <section class="ranking-column hope-column">
+                <div class="ranking-title"><span aria-hidden="true">↗</span><h3>Hopes and aspirations</h3></div>
+                <p>List up to five, from highest priority to lowest.</p>
+                <div class="ranked-fields" data-ranked="hopes"></div>
+              </section>
+              <section class="ranking-column concern-column">
+                <div class="ranking-title"><span aria-hidden="true">!</span><h3>Anxieties and fears</h3></div>
+                <p>List up to five, from greatest concern to lowest.</p>
+                <div class="ranked-fields" data-ranked="concerns"></div>
+              </section>
+            </div>
+
+            <div class="rating-matrix" data-matrix="concernRatings"></div>
+          </section>
+
+          <section class="form-step" data-step="maize_basics" data-title="Corn · land &amp; water" data-module="maize">
+            <div class="section-heading maize-heading">
+              <span>Section 4A · Part 1</span>
+              <h2>Feed corn: land, soil, and water</h2>
+              <p>This section appears because feed corn / maize production was selected.</p>
+            </div>
+
+            <div class="subsection-heading"><span>4A.1</span><h3>Plot details</h3></div>
+            <p class="section-instruction">Select each production system used. For a selected row, add topography and total area.</p>
+            <div class="record-collection" data-records="maizePlots"></div>
+            <div class="metric-strip"><span>Total reported area</span><strong id="maize-area-total">0 rai</strong></div>
+
+            <div class="form-grid two-columns">
+              <label class="field-card"><span><b>M1.</b> Years of continuous corn planting on this plot</span><input name="m.m1_years" type="number" min="0" max="90" inputmode="numeric" /></label>
+              <fieldset class="question-card compact-question">
+                <legend><b>M2.</b> Planting season <span class="multi-hint">Select all that apply</span></legend>
+                <div class="choice-list">
+                  <label><input name="m.m2_seasons" type="checkbox" value="Early rainy season" /><span>Early rainy season</span></label>
+                  <label><input name="m.m2_seasons" type="checkbox" value="Late rainy season" /><span>Late rainy season</span></label>
+                  <label><input name="m.m2_seasons" type="checkbox" value="Dry season (irrigated)" /><span>Dry season (irrigated)</span></label>
+                </div>
+              </fieldset>
+            </div>
+
+            <fieldset class="question-card">
+              <legend><b>M3.</b> Production arrangement <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns">
+                <label><input name="m.m3_arrangements" type="checkbox" value="Independent farming" /><span>Independent farming</span></label>
+                <label><input name="m.m3_arrangements" type="checkbox" value="Agricultural cooperative" data-controls="m3-coop" /><span>Agricultural cooperative member</span></label>
+                <label><input name="m.m3_arrangements" type="checkbox" value="Contract farming" data-controls="m3-contract" /><span>Contract farming</span></label>
+                <label><input name="m.m3_arrangements" type="checkbox" value="Large agricultural plot scheme" data-controls="m3-large" /><span>Large agricultural plot scheme</span></label>
+              </div>
+              <div class="conditional-detail-grid">
+                <label class="inline-detail conditional" id="m3-coop" hidden><span>Cooperative name</span><input name="m.m3_cooperative_name" type="text" maxlength="180" /></label>
+                <label class="inline-detail conditional" id="m3-contract" hidden><span>Contracting party</span><input name="m.m3_contract_party" type="text" maxlength="180" /></label>
+                <label class="inline-detail conditional" id="m3-large" hidden><span>Scheme / plot name</span><input name="m.m3_large_plot_name" type="text" maxlength="180" /></label>
+              </div>
+            </fieldset>
+
+            <aside class="dindi-card">
+              <img src="assets/dindi-guide.png" alt="Dindi land information guide" />
+              <div>
+                <p class="eyebrow">Spatial information</p>
+                <h3>Check the plot with Dindi</h3>
+                <p>The source questionnaire asks interviewers to check spatial information with the Dindi chatbot before continuing.</p>
+                <a class="secondary-button" href="https://line.me/R/ti/p/%40707avpuv" target="_blank" rel="noopener">Open Dindi in LINE <span aria-hidden="true">↗</span></a>
+              </div>
+            </aside>
+
+            <fieldset class="question-card">
+              <legend>Farm coordinates</legend>
+              <p class="question-help">Optional. Enter coordinates manually or use the device location button with the participant’s permission.</p>
+              <div class="form-grid coordinate-grid">
+                <label class="compact-field"><span>Latitude</span><input id="farm-latitude" name="m.coordinates_latitude" type="number" inputmode="decimal" min="-90" max="90" step="any" /></label>
+                <label class="compact-field"><span>Longitude</span><input id="farm-longitude" name="m.coordinates_longitude" type="number" inputmode="decimal" min="-180" max="180" step="any" /></label>
+                <button class="secondary-button" id="use-location" type="button">Use device location</button>
+              </div>
+              <p class="field-warning" id="location-message" role="status"></p>
+            </fieldset>
+
+            <div class="subsection-heading"><span>4A.2</span><h3>Soil and land-management information</h3></div>
+
+            <fieldset class="question-card">
+              <legend><b>M4.</b> Topsoil characteristics <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns">
+                <label><input name="m.m4_topsoil" type="checkbox" value="Clay" /><span>Clay — sticky, can be moulded into lumps</span></label>
+                <label><input name="m.m4_topsoil" type="checkbox" value="Loam" /><span>Loam — crumbly, loose grip</span></label>
+                <label><input name="m.m4_topsoil" type="checkbox" value="Sandy" /><span>Sandy — loose, non-binding</span></label>
+                <label><input name="m.m4_topsoil" type="checkbox" value="Sandy loam or clay loam" /><span>Sandy loam or clay loam</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>M5.</b> Topsoil drainage</legend>
+              <div class="choice-grid three-up">
+                <label><input name="m.m5_drainage" type="radio" value="Loose / good drainage" /><span>Loose / good drainage</span></label>
+                <label><input name="m.m5_drainage" type="radio" value="Moderately compact / moderate drainage" /><span>Moderate drainage</span></label>
+                <label><input name="m.m5_drainage" type="radio" value="Dense / easily waterlogged" /><span>Dense / easily waterlogged</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="question-card exclusive-group">
+              <legend><b>M6.</b> Soil inspection or analysis <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list">
+                <label><input name="m.m6_soil_testing" type="checkbox" value="Government agency / volunteer soil doctor" /><span>Government agency or volunteer soil doctor</span></label>
+                <label><input name="m.m6_soil_testing" type="checkbox" value="Self-test kit" /><span>Self-inspection using a soil test kit</span></label>
+                <label><input name="m.m6_soil_testing" type="checkbox" value="None / unsure" data-exclusive="true" /><span>None / unsure</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>M7.</b> Suitability for growing feed corn</legend>
+              <div class="choice-grid three-up">
+                <label><input name="m.m7_suitability" type="radio" value="Very suitable" /><span>Very suitable</span></label>
+                <label><input name="m.m7_suitability" type="radio" value="Moderately suitable" /><span>Moderately suitable</span></label>
+                <label><input name="m.m7_suitability" type="radio" value="Not suitable" data-controls="m7-alternatives" /><span>Not suitable</span></label>
+              </div>
+              <label class="inline-detail conditional" id="m7-alternatives" hidden><span><b>M7.1.</b> Other plants of interest following advice received</span><textarea name="m.m7_alternative_plants" rows="3" maxlength="800"></textarea></label>
+            </fieldset>
+
+            <fieldset class="question-card exclusive-group">
+              <legend><b>M8.</b> Conservation-area overlap <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list">
+                <label><input name="m.m8_conservation" type="checkbox" value="National park / no-hunting zone / wildlife sanctuary" /><span>National park, no-hunting zone, or wildlife sanctuary</span></label>
+                <label><input name="m.m8_conservation" type="checkbox" value="National Forest Reserve / Permanent Forest Boundary" /><span>National Forest Reserve or Permanent Forest Boundary</span></label>
+                <label><input name="m.m8_conservation" type="checkbox" value="Exempted area under National Land Policy Board Act B.E. 2562 (2019)" /><span>Exempted area under the National Land Policy Board Act B.E. 2562 (2019)</span></label>
+                <label><input name="m.m8_conservation" type="checkbox" value="Not in a conservation area" data-exclusive="true" /><span>Not in a conservation area</span></label>
+                <label><input name="m.m8_conservation" type="checkbox" value="Unknown" data-exclusive="true" /><span>Unknown</span></label>
+              </div>
+            </fieldset>
+
+            <div class="subsection-heading"><span>4A.3</span><h3>Water sources and irrigation</h3></div>
+
+            <fieldset class="question-card">
+              <legend><b>M9.</b> Water used on the plot <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns exclusive-group">
+                <label><input name="m.m9_water_sources" type="checkbox" value="Irrigation canal" /><span>Irrigation canal</span></label>
+                <label><input name="m.m9_water_sources" type="checkbox" value="Groundwater / artesian well" /><span>Groundwater / artesian well</span></label>
+                <label><input name="m.m9_water_sources" type="checkbox" value="Mountain water system" /><span>Mountain water system</span></label>
+                <label><input name="m.m9_water_sources" type="checkbox" value="Farm pond" /><span>Farm pond</span></label>
+                <label><input name="m.m9_water_sources" type="checkbox" value="Rainfed only" data-exclusive="true" /><span>Rainfed only / no irrigation</span></label>
+                <label><input name="m.m9_water_sources" type="checkbox" value="Other" data-controls="m9-other" /><span>Other</span></label>
+              </div>
+              <label class="inline-detail conditional" id="m9-other" hidden><span>Please specify</span><input name="m.m9_water_other" type="text" maxlength="180" /></label>
+            </fieldset>
+
+            <label class="field-card"><span><b>M10.</b> Annual water cost (Baht)</span><input name="m.m10_water_cost_baht" type="number" min="0" step="0.01" inputmode="decimal" /></label>
+            <div class="rating-matrix" data-matrix="maizeWaterSatisfaction"></div>
+            <label class="field-card"><span><b>M12.</b> Problems with agricultural water sources</span><textarea name="m.m12_water_problems" rows="4" maxlength="1500"></textarea></label>
+
+            <div class="subsection-heading"><span>4A.4</span><h3>Soil conditioning and plot preparation</h3></div>
+            <p class="section-instruction"><b>M13.</b> Select only the soil problems found. Severity and management fields open for each selected problem.</p>
+            <div class="issue-collection" data-issues="maizeSoilProblems"></div>
+          </section>
+
+          <section class="form-step" data-step="maize_practices" data-title="Corn · practices &amp; market" data-module="maize">
+            <div class="section-heading maize-heading">
+              <span>Section 4A · Part 2</span>
+              <h2>Feed corn: practices, varieties, and market</h2>
+              <p>Weed and pest management, production calendar, seed choices, harvest, and sales.</p>
+            </div>
+
+            <div class="subsection-heading"><span>4A.5</span><h3>Weed and pest management</h3></div>
+            <fieldset class="question-card">
+              <legend><b>M14.</b> Severity of weeds or pests on the plot</legend>
+              <div class="choice-list">
+                <label><input name="m.m14_pest_severity" type="radio" value="Very severe; clear yield impact every season" /><span>Very severe — clear yield impact every season</span></label>
+                <label><input name="m.m14_pest_severity" type="radio" value="Moderate; some impact in some periods" /><span>Moderate — some impact in some periods</span></label>
+                <label><input name="m.m14_pest_severity" type="radio" value="Low; easy to control" /><span>Low — easy to control</span></label>
+                <label><input name="m.m14_pest_severity" type="radio" value="Almost no problems" /><span>Almost no problems</span></label>
+              </div>
+            </fieldset>
+
+            <div class="split-panel">
+              <fieldset class="question-card tint-maize">
+                <legend><b>M15.</b> Common weeds <span class="multi-hint">Select all that apply</span></legend>
+                <div class="choice-list">
+                  <label><input name="m.m15_weeds" type="checkbox" value="Grasses" /><span>Grasses</span></label>
+                  <label><input name="m.m15_weeds" type="checkbox" value="Broadleaf weeds" /><span>Broadleaf weeds</span></label>
+                  <label><input name="m.m15_weeds" type="checkbox" value="Reeds / nutgrass" /><span>Reeds / nutgrass</span></label>
+                  <label><input name="m.m15_weeds" type="checkbox" value="Vines / ivy" /><span>Vines / ivy</span></label>
+                  <label><input name="m.m15_weeds" type="checkbox" value="Unsure of type" /><span>Unsure of type</span></label>
+                  <label><input name="m.m15_weeds" type="checkbox" value="Other" data-controls="m15-weed-other" /><span>Other</span></label>
+                </div>
+                <label class="inline-detail conditional" id="m15-weed-other" hidden><span>Please specify</span><input name="m.m15_weeds_other" type="text" maxlength="180" /></label>
+              </fieldset>
+              <fieldset class="question-card tint-leaf">
+                <legend><b>M15.</b> Common pests or diseases <span class="multi-hint">Select all that apply</span></legend>
+                <div class="choice-list">
+                  <label><input name="m.m15_pests" type="checkbox" value="Insect pests" /><span>Insect pests</span></label>
+                  <label><input name="m.m15_pests" type="checkbox" value="Fungal / bacterial / viral disease" /><span>Fungal, bacterial, or viral disease</span></label>
+                  <label><input name="m.m15_pests" type="checkbox" value="Animal pests (rats, birds)" /><span>Animal pests — rats, birds</span></label>
+                  <label><input name="m.m15_pests" type="checkbox" value="Nematodes" /><span>Nematodes</span></label>
+                  <label><input name="m.m15_pests" type="checkbox" value="Unsure of type" /><span>Unsure of type</span></label>
+                  <label><input name="m.m15_pests" type="checkbox" value="Other" data-controls="m15-pest-other" /><span>Other</span></label>
+                </div>
+                <label class="inline-detail conditional" id="m15-pest-other" hidden><span>Please specify</span><input name="m.m15_pests_other" type="text" maxlength="180" /></label>
+              </fieldset>
+            </div>
+
+            <fieldset class="question-card">
+              <legend><b>M15.</b> Weed-management methods <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns" data-checklist="maizeWeedMethods"></div>
+            </fieldset>
+            <fieldset class="question-card">
+              <legend><b>M15.</b> Pest-management methods <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns" data-checklist="maizePestMethods"></div>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>M16.</b> Use of integrated pest management (IPM)</legend>
+              <div class="choice-grid four-up">
+                <label><input name="m.m16_ipm" type="radio" value="Use regularly" /><span>Use regularly</span></label>
+                <label><input name="m.m16_ipm" type="radio" value="Use occasionally" /><span>Use occasionally</span></label>
+                <label><input name="m.m16_ipm" type="radio" value="Heard of it; never used" /><span>Heard of it; never used</span></label>
+                <label><input name="m.m16_ipm" type="radio" value="Never heard of it / do not know" /><span>Never heard of it / do not know</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>M17.</b> Pre-harvest interval after spraying chemicals</legend>
+              <div class="choice-grid four-up">
+                <label><input name="m.m17_preharvest_interval" type="radio" value="Follow every time" /><span>Follow every time</span></label>
+                <label><input name="m.m17_preharvest_interval" type="radio" value="Follow sometimes" /><span>Follow sometimes</span></label>
+                <label><input name="m.m17_preharvest_interval" type="radio" value="Never follow" /><span>Never follow</span></label>
+                <label><input name="m.m17_preharvest_interval" type="radio" value="Did not know a waiting period was required" /><span>Did not know it was required</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>M18.</b> Main obstacles in weed and pest management <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns" data-checklist="maizePestObstacles"></div>
+            </fieldset>
+
+            <div class="subsection-heading"><span>4A.6</span><h3>Cultivation calendar and weather information</h3></div>
+            <div class="month-collection" data-month-grid="maizeCalendar"></div>
+
+            <fieldset class="question-card">
+              <legend><b>M20.</b> Use of agricultural weather data or forecasts</legend>
+              <div class="choice-list">
+                <label><input name="m.m20_weather_use" type="radio" value="Regularly" data-controls="m20-weather-details" /><span>Use regularly</span></label>
+                <label><input name="m.m20_weather_use" type="radio" value="Occasionally" data-controls="m20-weather-details" /><span>Use occasionally</span></label>
+                <label><input name="m.m20_weather_use" type="radio" value="Never, but interested" /><span>Never used, but interested</span></label>
+                <label><input name="m.m20_weather_use" type="radio" value="Never, not interested" /><span>Never used and not interested</span></label>
+              </div>
+              <div class="conditional nested-card" id="m20-weather-details" hidden>
+                <label class="inline-detail"><span>Weather-information source</span><input name="m.m20_weather_source" type="text" maxlength="200" /></label>
+                <fieldset class="nested-fieldset">
+                  <legend><b>M20.1.</b> Decisions informed by weather data</legend>
+                  <div class="choice-list two-columns" data-checklist="maizeWeatherDecisions"></div>
+                </fieldset>
+                <div class="rating-matrix" data-matrix="maizeForecastConfidence"></div>
+              </div>
+            </fieldset>
+
+            <fieldset class="question-card exclusive-group">
+              <legend><b>M21.</b> Cropping systems used <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns">
+                <label><input name="m.m21_systems" type="checkbox" value="Intercropping" data-controls="m21-intercropping" /><span>Intercropping</span></label>
+                <label><input name="m.m21_systems" type="checkbox" value="Alley cropping" data-controls="m21-alley" /><span>Alley cropping</span></label>
+                <label><input name="m.m21_systems" type="checkbox" value="Agroforestry" data-controls="m21-agroforestry" /><span>Agroforestry</span></label>
+                <label><input name="m.m21_systems" type="checkbox" value="None of these" data-exclusive="true" /><span>None of these</span></label>
+                <label><input name="m.m21_systems" type="checkbox" value="Other" data-controls="m21-other" /><span>Other</span></label>
+              </div>
+              <div class="conditional-detail-grid">
+                <label class="inline-detail conditional" id="m21-intercropping" hidden><span>Plants used in intercropping</span><input name="m.m21_intercropping_plants" type="text" maxlength="200" /></label>
+                <label class="inline-detail conditional" id="m21-alley" hidden><span>Plants used in alley cropping</span><input name="m.m21_alley_plants" type="text" maxlength="200" /></label>
+                <label class="inline-detail conditional" id="m21-agroforestry" hidden><span>Plants / trees used in agroforestry</span><input name="m.m21_agroforestry_plants" type="text" maxlength="200" /></label>
+                <label class="inline-detail conditional" id="m21-other" hidden><span>Other system and plants</span><input name="m.m21_other" type="text" maxlength="200" /></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>M22.</b> Have you adjusted planting or harvest dates?</legend>
+              <div class="choice-grid two-up">
+                <label><input name="m.m22_calendar_adjusted" type="radio" value="Yes" data-controls="m22-yes" /><span>Yes</span></label>
+                <label><input name="m.m22_calendar_adjusted" type="radio" value="No" data-controls="m22-no" /><span>No</span></label>
+              </div>
+              <label class="inline-detail conditional" id="m22-yes" hidden><span>What changed, and why?</span><textarea name="m.m22_adjustment_details" rows="3" maxlength="800"></textarea></label>
+              <label class="inline-detail conditional" id="m22-no" hidden><span>Why not?</span><textarea name="m.m22_not_adjusted_reason" rows="3" maxlength="800"></textarea></label>
+            </fieldset>
+
+            <div class="subsection-heading"><span>4A.7</span><h3>Feed corn varieties</h3></div>
+            <p class="section-instruction"><b>M23.</b> Enter up to five varieties, in descending order by planted-area share.</p>
+            <div class="record-collection" data-records="maizeVarieties"></div>
+            <p class="field-warning" id="maize-variety-warning" role="status"></p>
+            <div class="rating-matrix" data-matrix="maizeVarietyCriteria"></div>
+
+            <fieldset class="question-card">
+              <legend><b>M25.</b> Changed corn varieties in the past 3–5 years?</legend>
+              <div class="choice-grid two-up">
+                <label><input name="m.m25_changed_variety" type="radio" value="Yes" data-controls="m25-reason" /><span>Yes</span></label>
+                <label><input name="m.m25_changed_variety" type="radio" value="No" /><span>No</span></label>
+              </div>
+              <label class="inline-detail conditional" id="m25-reason" hidden><span>Reason for changing</span><textarea name="m.m25_change_reason" rows="3" maxlength="800"></textarea></label>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>M26.</b> Awareness and use of weather- or pest-resistant corn varieties</legend>
+              <div class="choice-grid three-up">
+                <label><input name="m.m26_resistant_varieties" type="radio" value="Know and have used" /><span>Know and have used</span></label>
+                <label><input name="m.m26_resistant_varieties" type="radio" value="Know but have not used" /><span>Know but have not used</span></label>
+                <label><input name="m.m26_resistant_varieties" type="radio" value="Do not know" /><span>Do not know</span></label>
+              </div>
+            </fieldset>
+
+            <div class="subsection-heading"><span>4A.8</span><h3>Harvest and post-harvest handling</h3></div>
+            <fieldset class="question-card">
+              <legend><b>M27.</b> Harvesting methods <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns">
+                <label><input name="m.m27_harvest_methods" type="checkbox" value="Hand-picking ears" /><span>Hand-picking ears</span></label>
+                <label><input name="m.m27_harvest_methods" type="checkbox" value="Harvesting machine" /><span>Harvesting machine</span></label>
+                <label><input name="m.m27_harvest_methods" type="checkbox" value="Cut fresh plants, chop, and ferment" /><span>Cut fresh plants, chop, and ferment</span></label>
+                <label><input name="m.m27_harvest_methods" type="checkbox" value="Other" data-controls="m27-other" /><span>Other</span></label>
+              </div>
+              <label class="inline-detail conditional" id="m27-other" hidden><span>Please specify</span><input name="m.m27_harvest_other" type="text" maxlength="180" /></label>
+              <div class="form-grid three-columns top-gap">
+                <label class="compact-field"><span>Harvests per year</span><input name="m.m27_times_per_year" type="number" min="0" max="20" step="1" /></label>
+                <label class="compact-field"><span>Total expense (Baht)</span><input name="m.m27_total_expense_baht" type="number" min="0" step="0.01" /></label>
+                <label class="compact-field"><span>Average cost per rai (Baht)</span><input name="m.m27_cost_per_rai_baht" type="number" min="0" step="0.01" /></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>M28.</b> Post-harvest management <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns">
+                <label><input name="m.m28_postharvest" type="checkbox" value="Sun-dry in the field" /><span>Sun-dry in the field</span></label>
+                <label><input name="m.m28_postharvest" type="checkbox" value="Use a dryer / dehumidifier" /><span>Use a dryer / dehumidifier</span></label>
+                <label><input name="m.m28_postharvest" type="checkbox" value="Sell fresh immediately" /><span>Sell fresh immediately</span></label>
+                <label><input name="m.m28_postharvest" type="checkbox" value="Other" data-controls="m28-other" /><span>Other</span></label>
+              </div>
+              <div class="form-grid two-columns top-gap">
+                <label class="inline-detail conditional" id="m28-other" hidden><span>Please specify</span><input name="m.m28_other" type="text" maxlength="180" /></label>
+                <label class="compact-field"><span><b>M28.1.</b> Kernel moisture at sale (%)</span><input name="m.m28_moisture_percent" type="number" min="0" max="100" step="0.1" /></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="question-card exclusive-group">
+              <legend><b>M29.</b> Produce storage</legend>
+              <div class="choice-list two-columns">
+                <label><input name="m.m29_storage" type="checkbox" value="Own farm" /><span>Stored on own farm</span></label>
+                <label><input name="m.m29_storage" type="checkbox" value="No storage; sell immediately" data-exclusive="true" /><span>No storage; sell immediately</span></label>
+                <label><input name="m.m29_storage" type="checkbox" value="Cooperative / community centre" /><span>Cooperative or community centre</span></label>
+                <label><input name="m.m29_storage" type="checkbox" value="Other" data-controls="m29-other" /><span>Other</span></label>
+              </div>
+              <label class="inline-detail conditional" id="m29-other" hidden><span>Please specify</span><input name="m.m29_other" type="text" maxlength="180" /></label>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>M29.1.</b> Yield loss during storage</legend>
+              <div class="choice-grid two-up">
+                <label><input name="m.m29_storage_loss" type="radio" value="No" /><span>No</span></label>
+                <label><input name="m.m29_storage_loss" type="radio" value="Yes" data-controls="m29-loss-cause" /><span>Yes</span></label>
+              </div>
+              <label class="inline-detail conditional" id="m29-loss-cause" hidden><span>Cause and approximate loss</span><textarea name="m.m29_storage_loss_details" rows="3" maxlength="800"></textarea></label>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>M30.</b> Buyers <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns">
+                <label><input name="m.m30_buyers" type="checkbox" value="Local trader" /><span>Local trader</span></label>
+                <label><input name="m.m30_buyers" type="checkbox" value="Feed mill" /><span>Feed mill</span></label>
+                <label><input name="m.m30_buyers" type="checkbox" value="Cooperative" /><span>Cooperative</span></label>
+                <label><input name="m.m30_buyers" type="checkbox" value="Land owner / lessor" /><span>Land owner / lessor</span></label>
+                <label><input name="m.m30_buyers" type="checkbox" value="Other" data-controls="m30-other" /><span>Other</span></label>
+              </div>
+              <label class="inline-detail conditional" id="m30-other" hidden><span>Please specify</span><input name="m.m30_other" type="text" maxlength="180" /></label>
+            </fieldset>
+
+            <p class="section-instruction"><b>M31.</b> Distance and transportation costs</p>
+            <div class="record-collection" data-records="maizeTransport"></div>
+            <div class="form-grid two-columns">
+              <label class="field-card"><span><b>M31.1.</b> Main transportation method</span><input name="m.m31_transport_method" type="text" maxlength="200" /></label>
+              <label class="field-card"><span><b>M32.</b> Price received (Baht per kg)</span><input name="m.m32_price_baht_per_kg" type="number" min="0" step="0.01" inputmode="decimal" /></label>
+            </div>
+            <label class="field-card"><span><b>M32.1.</b> What factors determine this price?</span><textarea name="m.m32_price_factors" rows="3" maxlength="1000"></textarea></label>
+            <div class="rating-matrix" data-matrix="maizePriceSatisfaction"></div>
+          </section>
+
+          <section class="form-step" data-step="livestock_basics" data-title="Livestock · farm &amp; inputs" data-module="livestock">
+            <div class="section-heading livestock-heading">
+              <span>Section 4B · Part 1</span>
+              <h2>Livestock: farm, housing, water, and feed</h2>
+              <p>This section appears because livestock production was selected.</p>
+            </div>
+
+            <div class="subsection-heading"><span>4B.1</span><h3>Farm information</h3></div>
+            <p class="section-instruction"><b>L1.</b> Select each animal type raised, then complete the fields that open.</p>
+            <div class="record-collection" data-records="livestockTypes"></div>
+            <label class="field-card"><span><b>L1.1.</b> Other animals or crops sharing the farm</span><textarea name="l.l1_shared_activities" rows="3" maxlength="800"></textarea></label>
+
+            <p class="section-instruction"><b>L2.</b> Rearing systems and farm-location conditions. Complete each system used.</p>
+            <div class="record-collection" data-records="livestockSystems"></div>
+
+            <div class="form-grid three-columns">
+              <label class="field-card"><span><b>L3.</b> Years raising these animals on this farm</span><input name="l.l3_years" type="number" min="0" max="90" /></label>
+              <label class="field-card"><span><b>L4.</b> Production cycles per year</span><input name="l.l4_cycles_per_year" type="number" min="0" max="365" step="0.1" /></label>
+              <label class="field-card"><span><b>L5.</b> Break between housing cycles (days)</span><input name="l.l5_break_days" type="number" min="0" max="365" /></label>
+            </div>
+
+            <fieldset class="question-card">
+              <legend><b>L5.</b> Is there a break between housing cycles?</legend>
+              <div class="choice-grid two-up">
+                <label><input name="l.l5_has_break" type="radio" value="No" /><span>No</span></label>
+                <label><input name="l.l5_has_break" type="radio" value="Yes" data-controls="l5-period" /><span>Yes</span></label>
+              </div>
+              <label class="inline-detail conditional" id="l5-period" hidden><span>Break period / timing</span><input name="l.l5_break_period" type="text" maxlength="180" /></label>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>L6.</b> Production arrangements <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns">
+                <label><input name="l.l6_arrangements" type="checkbox" value="Group model" /><span>Group model</span></label>
+                <label><input name="l.l6_arrangements" type="checkbox" value="Independent farming" /><span>Independent farming</span></label>
+                <label><input name="l.l6_arrangements" type="checkbox" value="Cooperative" data-controls="l6-coop" /><span>Cooperative member</span></label>
+                <label><input name="l.l6_arrangements" type="checkbox" value="Contract farming" data-controls="l6-contract" /><span>Contract farming</span></label>
+                <label><input name="l.l6_arrangements" type="checkbox" value="Large livestock plot scheme" data-controls="l6-large" /><span>Large livestock plot scheme</span></label>
+                <label><input name="l.l6_arrangements" type="checkbox" value="Community enterprise" data-controls="l6-enterprise" /><span>Community enterprise</span></label>
+              </div>
+              <div class="conditional-detail-grid">
+                <label class="inline-detail conditional" id="l6-coop" hidden><span>Cooperative name</span><input name="l.l6_cooperative_name" type="text" maxlength="180" /></label>
+                <label class="inline-detail conditional" id="l6-contract" hidden><span>Contracting party</span><input name="l.l6_contract_party" type="text" maxlength="180" /></label>
+                <label class="inline-detail conditional" id="l6-large" hidden><span>Scheme name</span><input name="l.l6_large_plot_name" type="text" maxlength="180" /></label>
+                <label class="inline-detail conditional" id="l6-enterprise" hidden><span>Enterprise name</span><input name="l.l6_enterprise_name" type="text" maxlength="180" /></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="question-card conditional" id="l7-contract-support" hidden>
+              <legend><b>L7.</b> Inputs or support received from the contracting party <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns" data-checklist="contractSupport"></div>
+            </fieldset>
+
+            <div class="subsection-heading"><span>4B.2</span><h3>Housing, paddocks, and land use</h3></div>
+            <fieldset class="question-card">
+              <legend><b>L8.</b> Floor or housing characteristics <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns" data-checklist="housingFloors"></div>
+            </fieldset>
+            <fieldset class="question-card">
+              <legend><b>L8.1.</b> Bedding / litter material <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns exclusive-group" data-checklist="beddingMaterials"></div>
+              <label class="inline-detail top-gap"><span><b>L8.2.</b> Replacement or refill frequency per cycle</span><input name="l.l8_bedding_replacements_per_cycle" type="number" min="0" max="100" step="0.1" /></label>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>L9.</b> Drainage and moisture in the animal area</legend>
+              <div class="choice-grid three-up">
+                <label><input name="l.l9_drainage" type="radio" value="Dry / good drainage" /><span>Dry / good drainage</span></label>
+                <label><input name="l.l9_drainage" type="radio" value="Moderate moisture / drainage" /><span>Moderate moisture / drainage</span></label>
+                <label><input name="l.l9_drainage" type="radio" value="Wet / easily waterlogged" /><span>Wet / easily waterlogged</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>L10.</b> Checks or analyses conducted <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns" data-checklist="livestockChecks"></div>
+            </fieldset>
+
+            <fieldset class="question-card exclusive-group">
+              <legend><b>L11.</b> Farm certification <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns" data-checklist="farmCertifications"></div>
+            </fieldset>
+
+            <fieldset class="question-card exclusive-group">
+              <legend><b>L12.</b> Overlap with or proximity to protected areas <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list" data-checklist="livestockProtectedAreas"></div>
+              <div class="form-grid three-columns top-gap">
+                <label class="compact-field"><span><b>L13.1.</b> Nearest public water source (m)</span><input name="l.l13_distance_water_m" type="number" min="0" step="0.1" /></label>
+                <label class="compact-field"><span><b>L13.2.</b> Nearest home / community (m)</span><input name="l.l13_distance_community_m" type="number" min="0" step="0.1" /></label>
+                <label class="compact-field"><span><b>L13.3.</b> Odour / wastewater complaint?</span><select name="l.l13_complaint" data-controls-select="l13-complaint-detail"><option value="">Select…</option><option value="No">No</option><option value="Yes">Yes</option></select></label>
+              </div>
+              <label class="inline-detail conditional" id="l13-complaint-detail" hidden><span>Complaint details</span><textarea name="l.l13_complaint_details" rows="3" maxlength="800"></textarea></label>
+            </fieldset>
+
+            <div class="subsection-heading"><span>4B.3</span><h3>Water resources and management</h3></div>
+            <fieldset class="question-card">
+              <legend><b>L13.</b> Livestock water sources <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns" data-checklist="livestockWaterSources"></div>
+              <label class="inline-detail top-gap"><span>Annual water cost (Baht)</span><input name="l.l13_water_cost_baht" type="number" min="0" step="0.01" /></label>
+            </fieldset>
+            <fieldset class="question-card">
+              <legend><b>L14.</b> How water is supplied to animals <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns" data-checklist="livestockWaterDelivery"></div>
+            </fieldset>
+            <div class="rating-matrix" data-matrix="livestockWaterRatings"></div>
+            <label class="field-card"><span><b>L22.</b> Problems with the farm water source</span><textarea name="l.l22_water_problems" rows="4" maxlength="1500"></textarea></label>
+
+            <div class="subsection-heading"><span>4B.4</span><h3>Inputs and management</h3></div>
+            <fieldset class="question-card">
+              <legend><b>L23.</b> Animal feed <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns" data-checklist="animalFeedTypes"></div>
+              <div class="form-grid two-columns top-gap">
+                <label class="compact-field"><span>Self-produced share (%)</span><input name="l.l23_self_produced_percent" type="number" min="0" max="100" step="0.1" /></label>
+                <label class="compact-field"><span>Purchased share (%)</span><input name="l.l23_purchased_percent" type="number" min="0" max="100" step="0.1" /></label>
+                <label class="compact-field"><span>Where purchased</span><input name="l.l23_purchase_source" type="text" maxlength="200" /></label>
+                <label class="compact-field"><span>Feed amount per animal per day</span><input name="l.l23_amount_per_animal_day" type="text" maxlength="100" placeholder="Include unit" /></label>
+                <label class="compact-field full-width"><span>Annual feed cost (Baht)</span><input name="l.l23_annual_feed_cost_baht" type="number" min="0" step="0.01" /></label>
+              </div>
+              <p class="field-warning" id="feed-share-warning" role="status"></p>
+            </fieldset>
+
+            <div class="conditional" id="l24-feed-brands" hidden>
+              <p class="section-instruction"><b>L24.</b> Up to three purchased feed brands or types.</p>
+              <div class="record-collection" data-records="feedBrands"></div>
+            </div>
+            <div class="conditional" id="l25-feed-ingredients" hidden>
+              <p class="section-instruction"><b>L25.</b> Ingredients used when mixing feed on the farm.</p>
+              <div class="record-collection" data-records="feedIngredients"></div>
+            </div>
+            <fieldset class="question-card conditional" id="l25-own-corn" hidden>
+              <legend><b>L25.1.</b> Use of corn grown on this farm as animal feed</legend>
+              <div class="choice-list">
+                <label><input name="l.l25_own_corn_use" type="radio" value="Used as feed" data-controls="l25-own-corn-percent" /><span>Used as animal feed</span></label>
+                <label><input name="l.l25_own_corn_use" type="radio" value="Not used; sold all" /><span>Not used — sold all</span></label>
+                <label><input name="l.l25_own_corn_use" type="radio" value="Corn not grown" /><span>Corn not grown</span></label>
+              </div>
+              <label class="inline-detail conditional" id="l25-own-corn-percent" hidden><span>Approximate share used as feed (%)</span><input name="l.l25_own_corn_percent" type="number" min="0" max="100" step="0.1" /></label>
+            </fieldset>
+          </section>
+
+          <section class="form-step" data-step="livestock_practices" data-title="Livestock · health &amp; market" data-module="livestock">
+            <div class="section-heading livestock-heading">
+              <span>Section 4B · Part 2</span>
+              <h2>Livestock: resilience, health, and market</h2>
+              <p>Housing risks, animal health, weather response, breeds, products, and waste management.</p>
+            </div>
+
+            <p class="section-instruction"><b>L26.</b> Select environmental or housing problems found. Severity and management fields open for each selected problem.</p>
+            <div class="issue-collection" data-issues="livestockHousingProblems"></div>
+            <div class="rating-matrix" data-matrix="livestockStatements"></div>
+
+            <div class="subsection-heading"><span>4B.5</span><h3>Animal health, diseases, and medication</h3></div>
+            <fieldset class="question-card">
+              <legend><b>L25.</b> Disease or parasite problems in the past year</legend>
+              <div class="choice-grid four-up">
+                <label><input name="l.l25_disease_severity" type="radio" value="Very severe" /><span>Very severe</span></label>
+                <label><input name="l.l25_disease_severity" type="radio" value="Moderate" /><span>Moderate</span></label>
+                <label><input name="l.l25_disease_severity" type="radio" value="Mild" /><span>Mild</span></label>
+                <label><input name="l.l25_disease_severity" type="radio" value="Almost no problems" /><span>Almost no problems</span></label>
+              </div>
+            </fieldset>
+            <p class="section-instruction"><b>L26.</b> Select diseases, parasites, or vectors found and describe them.</p>
+            <div class="issue-collection" data-issues="livestockHealthProblems"></div>
+            <div class="form-grid two-columns">
+              <label class="field-card"><span><b>L26.1.</b> Recent-cycle mortality (%)</span><input name="l.l26_mortality_percent" type="number" min="0" max="100" step="0.1" /></label>
+              <label class="field-card"><span>Or number of deaths</span><input name="l.l26_mortality_count" type="number" min="0" step="1" /></label>
+            </div>
+
+            <fieldset class="question-card">
+              <legend><b>L27.</b> Use of farm biosecurity principles</legend>
+              <div class="choice-grid four-up">
+                <label><input name="l.l27_biosecurity" type="radio" value="Use regularly" data-controls="l27-measures" /><span>Use regularly</span></label>
+                <label><input name="l.l27_biosecurity" type="radio" value="Use occasionally" data-controls="l27-measures" /><span>Use occasionally</span></label>
+                <label><input name="l.l27_biosecurity" type="radio" value="Heard of it; never used" /><span>Heard of it; never used</span></label>
+                <label><input name="l.l27_biosecurity" type="radio" value="Never heard / do not know" /><span>Never heard / do not know</span></label>
+              </div>
+              <div class="conditional nested-card" id="l27-measures" hidden>
+                <p><b>L27.1.</b> Biosecurity measures used</p>
+                <div class="choice-list two-columns" data-checklist="biosecurityMeasures"></div>
+              </div>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>L28.</b> Withdrawal period before selling animals, milk, or eggs</legend>
+              <div class="choice-grid four-up">
+                <label><input name="l.l28_withdrawal_period" type="radio" value="Follow every time" /><span>Follow every time</span></label>
+                <label><input name="l.l28_withdrawal_period" type="radio" value="Follow sometimes" /><span>Follow sometimes</span></label>
+                <label><input name="l.l28_withdrawal_period" type="radio" value="Never follow" /><span>Never follow</span></label>
+                <label><input name="l.l28_withdrawal_period" type="radio" value="Do not know" /><span>Do not know</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>L29.</b> Antibiotic use on the farm</legend>
+              <div class="choice-list">
+                <label><input name="l.l29_antibiotics" type="radio" value="Only when sick and prescribed by a veterinarian" /><span>Only when an animal is sick and prescribed by a veterinarian</span></label>
+                <label><input name="l.l29_antibiotics" type="radio" value="Regularly mixed in feed for prevention" /><span>Regularly mixed in feed for disease prevention</span></label>
+                <label><input name="l.l29_antibiotics" type="radio" value="Used to accelerate growth" /><span>Used to accelerate growth</span></label>
+                <label><input name="l.l29_antibiotics" type="radio" value="Not used" /><span>Not used</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>L29.1.</b> Medication and vaccination records</legend>
+              <div class="choice-grid three-up">
+                <label><input name="l.l29_records" type="radio" value="Always recorded" /><span>Always recorded</span></label>
+                <label><input name="l.l29_records" type="radio" value="Sometimes recorded" /><span>Sometimes recorded</span></label>
+                <label><input name="l.l29_records" type="radio" value="Not recorded" /><span>Not recorded</span></label>
+              </div>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>L30.</b> Obstacles in animal-health management <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns" data-checklist="animalHealthObstacles"></div>
+            </fieldset>
+
+            <div class="subsection-heading"><span>4B.6</span><h3>Production and weather-response calendar</h3></div>
+            <div class="month-collection" data-month-grid="livestockCalendar"></div>
+
+            <fieldset class="question-card">
+              <legend><b>L32.</b> Use of weather data or forecasts in farm management</legend>
+              <div class="choice-list">
+                <label><input name="l.l32_weather_use" type="radio" value="Regularly" data-controls="l32-weather-details" /><span>Use regularly</span></label>
+                <label><input name="l.l32_weather_use" type="radio" value="Occasionally" data-controls="l32-weather-details" /><span>Use occasionally</span></label>
+                <label><input name="l.l32_weather_use" type="radio" value="Never, but interested" /><span>Never used, but interested</span></label>
+                <label><input name="l.l32_weather_use" type="radio" value="Never, not interested" /><span>Never used and not interested</span></label>
+              </div>
+              <div class="conditional nested-card" id="l32-weather-details" hidden>
+                <label class="inline-detail"><span>Weather-information source</span><input name="l.l32_weather_source" type="text" maxlength="200" /></label>
+                <fieldset class="nested-fieldset">
+                  <legend><b>L32.1.</b> Decisions informed by weather data</legend>
+                  <div class="choice-list two-columns" data-checklist="livestockWeatherDecisions"></div>
+                </fieldset>
+                <div class="rating-matrix" data-matrix="livestockForecastConfidence"></div>
+              </div>
+            </fieldset>
+
+            <p class="section-instruction"><b>L33.</b> Select climate events that affected the farm in the past year.</p>
+            <div class="issue-collection" data-issues="livestockClimateEvents"></div>
+
+            <div class="subsection-heading"><span>4B.7</span><h3>Animal breeds</h3></div>
+            <p class="section-instruction"><b>L34.</b> Enter up to five breeds in descending order by share.</p>
+            <div class="record-collection" data-records="livestockBreeds"></div>
+            <p class="field-warning" id="livestock-breed-warning" role="status"></p>
+
+            <fieldset class="question-card">
+              <legend><b>L34.1.</b> Breed sources <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns" data-checklist="breedSources"></div>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>L35.</b> Changed the breed raised in the past 3–5 years?</legend>
+              <div class="choice-grid two-up">
+                <label><input name="l.l35_changed_breed" type="radio" value="Yes" data-controls="l35-reason" /><span>Yes</span></label>
+                <label><input name="l.l35_changed_breed" type="radio" value="No" /><span>No</span></label>
+              </div>
+              <label class="inline-detail conditional" id="l35-reason" hidden><span>Reason for changing</span><textarea name="l.l35_change_reason" rows="3" maxlength="800"></textarea></label>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>L36.</b> Awareness and use of heat- or disease-resistant breeds</legend>
+              <div class="choice-grid three-up">
+                <label><input name="l.l36_resistant_breeds" type="radio" value="Know and have used" /><span>Know and have used</span></label>
+                <label><input name="l.l36_resistant_breeds" type="radio" value="Know but have not used" /><span>Know but have not used</span></label>
+                <label><input name="l.l36_resistant_breeds" type="radio" value="Do not know" /><span>Do not know</span></label>
+              </div>
+            </fieldset>
+            <div class="rating-matrix" data-matrix="livestockBreedCriteria"></div>
+
+            <div class="subsection-heading"><span>4B.8</span><h3>Products, post-production management, and distribution</h3></div>
+            <fieldset class="question-card">
+              <legend><b>L38.</b> Products <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns" data-checklist="livestockProducts"></div>
+            </fieldset>
+            <fieldset class="question-card">
+              <legend><b>L39.</b> Harvest / collection methods <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns" data-checklist="livestockHarvestMethods"></div>
+              <div class="record-collection top-gap" data-records="livestockHarvestCosts"></div>
+            </fieldset>
+            <fieldset class="question-card">
+              <legend><b>L40.</b> Post-production output management <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns" data-checklist="livestockPostProduction"></div>
+              <label class="inline-detail top-gap"><span><b>L40.1.</b> Average time from production to delivery</span><input name="l.l40_delivery_time" type="text" maxlength="100" placeholder="e.g. 6 hours or 1 day" /></label>
+            </fieldset>
+            <fieldset class="question-card exclusive-group">
+              <legend><b>L41.</b> Produce storage</legend>
+              <div class="choice-list two-columns" data-checklist="livestockStorage"></div>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>L42.</b> Losses before sale or disposal</legend>
+              <label class="inline-detail"><span>Amount or percentage lost in the past year</span><input name="l.l42_loss_amount" type="text" maxlength="160" /></label>
+              <div class="choice-list two-columns top-gap" data-checklist="livestockLossCauses"></div>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>L43.</b> Main point of sale</legend>
+              <div class="form-grid two-columns">
+                <label class="compact-field"><span>Buyer</span><input name="l.l43_buyer" type="text" maxlength="200" /></label>
+                <label class="compact-field"><span>Price received</span><input name="l.l43_price_received" type="text" maxlength="100" placeholder="Include unit" /></label>
+                <label class="compact-field"><span>Shipping cost (Baht)</span><input name="l.l43_shipping_cost_baht" type="number" min="0" step="0.01" /></label>
+                <label class="compact-field"><span>Distance to buyer (km)</span><input name="l.l43_distance_km" type="number" min="0" step="0.1" /></label>
+                <label class="compact-field"><span>Means of transport</span><input name="l.l43_transport" type="text" maxlength="160" /></label>
+                <label class="compact-field"><span>Who pays shipping?</span><select name="l.l43_shipping_payer"><option value="">Select…</option><option>Farmer</option><option>Buyer</option><option>Shared</option></select></label>
+              </div>
+              <fieldset class="nested-fieldset top-gap">
+                <legend>Buyer type <span class="multi-hint">Select all that apply</span></legend>
+                <div class="choice-list two-columns" data-checklist="livestockBuyerTypes"></div>
+              </fieldset>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>L44.</b> Factors determining price <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns" data-checklist="livestockPriceFactors"></div>
+            </fieldset>
+            <div class="rating-matrix" data-matrix="livestockPriceSatisfaction"></div>
+            <fieldset class="question-card">
+              <legend><b>L45.1.</b> Power to negotiate with the buyer</legend>
+              <div class="choice-grid three-up">
+                <label><input name="l.l45_negotiation_power" type="radio" value="Fully negotiable" /><span>Fully negotiable</span></label>
+                <label><input name="l.l45_negotiation_power" type="radio" value="Somewhat negotiable" /><span>Somewhat negotiable</span></label>
+                <label><input name="l.l45_negotiation_power" type="radio" value="Not negotiable" /><span>Not negotiable</span></label>
+              </div>
+            </fieldset>
+
+            <div class="subsection-heading"><span>4B.9</span><h3>Waste management and farm-waste use</h3></div>
+            <fieldset class="question-card">
+              <legend><b>L46.</b> Farm layout</legend>
+              <p class="question-help">The paper form asks for a sketch. For mobile data collection, describe the relative locations below.</p>
+              <div class="form-grid three-columns">
+                <label class="compact-field"><span>Animal houses / paddocks</span><textarea name="l.l46_housing_location" rows="3" maxlength="500"></textarea></label>
+                <label class="compact-field"><span>Water source</span><textarea name="l.l46_water_location" rows="3" maxlength="500"></textarea></label>
+                <label class="compact-field"><span>Waste-management area</span><textarea name="l.l46_waste_location" rows="3" maxlength="500"></textarea></label>
+              </div>
+              <label class="inline-detail top-gap"><span>Additional layout notes</span><textarea name="l.l46_layout_notes" rows="3" maxlength="800"></textarea></label>
+            </fieldset>
+
+            <fieldset class="question-card">
+              <legend><b>L47.</b> Farm-waste management <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns" data-checklist="wasteManagementMethods"></div>
+              <div class="form-grid three-columns top-gap">
+                <label class="compact-field"><span><b>L47.1.</b> Annual manure production</span><input name="l.l47_manure_production" type="text" maxlength="100" placeholder="Include unit: tonnes or sacks" /></label>
+                <label class="compact-field"><span><b>L47.2.</b> Annual manure-sale revenue (Baht)</span><input name="l.l47_manure_revenue_baht" type="number" min="0" step="0.01" /></label>
+                <label class="compact-field"><span>Manure not sold</span><select name="l.l47_manure_not_sold"><option value="">Select…</option><option value="Yes">Yes</option><option value="No">No</option></select></label>
+              </div>
+            </fieldset>
+            <fieldset class="question-card">
+              <legend><b>L47.3.</b> Dead-animal carcass handling <span class="multi-hint">Select all that apply</span></legend>
+              <div class="choice-list two-columns" data-checklist="carcassHandling"></div>
+            </fieldset>
+            <p class="section-instruction"><b>L48.</b> Integrated crop–livestock practices. Select each practice used and describe the plant or animal type.</p>
+            <div class="issue-collection" data-issues="integratedPractices"></div>
+          </section>
+
+          <section class="form-step" data-step="climate" data-title="Climate history">
+            <div class="section-heading climate-heading">
+              <span>Section 5</span>
+              <h2>Climate threats and past losses</h2>
+              <p>Seasonal rainfall, environmental hazards, and the most severe losses during 2021–2025 (B.E. 2564–2568).</p>
+            </div>
+
+            <div class="climate-grid" data-climate-grid="rainfallHistory"></div>
+            <div class="climate-grid" data-climate-grid="hazardHistory"></div>
+
+            <div class="subsection-heading"><span>A3</span><h3>Losses from disasters and extreme conditions</h3></div>
+            <p class="section-instruction">Enter up to five losses, from most severe to least severe.</p>
+            <div class="record-collection" data-records="climateLosses"></div>
+          </section>
+
+          <section class="form-step" data-step="needs" data-title="Measures &amp; finish">
+            <div class="section-heading needs-heading">
+              <span>Section 6</span>
+              <h2>Farm measures, limitations, and needs</h2>
+              <p>What has already been tried, where support is needed, and final comments.</p>
+            </div>
+
+            <p class="section-instruction"><b>N1.</b> Up to five farm measures taken, in order of importance.</p>
+            <div class="record-collection" data-records="adaptationMeasures"></div>
+
+            <p class="section-instruction"><b>N2.</b> Up to three types of support received or of greatest interest.</p>
+            <div class="record-collection" data-records="supportReceived"></div>
+
+            <p class="section-instruction"><b>N3.</b> Up to three constraints and support needs, in order of urgency.</p>
+            <div class="record-collection" data-records="supportConstraints"></div>
+
+            <div class="rating-matrix" data-matrix="supportPriorities"></div>
+
+            <div class="subsection-heading"><span>Wrapping up</span><h3>Final comments</h3></div>
+            <label class="field-card"><span><b>Z1.</b> Is there anything else you would like to share?</span><textarea name="z.additional_feedback" rows="5" maxlength="3000"></textarea></label>
+
+            <fieldset class="question-card" data-required-group="z.follow_up">
+              <legend><b>Z2.</b> May the project contact you for a future visit? <span class="required-badge">Required</span></legend>
+              <div class="choice-grid two-up">
+                <label><input name="z.follow_up" type="radio" value="Yes" /><span>Yes</span></label>
+                <label><input name="z.follow_up" type="radio" value="No" /><span>No</span></label>
+              </div>
+              <p class="question-help">This form does not ask for a name or phone number. Follow-up uses the separate participant-ID register held by the project team.</p>
+            </fieldset>
+
+            <section class="review-card" aria-labelledby="review-title">
+              <div>
+                <p class="eyebrow">Review</p>
+                <h3 id="review-title">Ready to send?</h3>
+              </div>
+              <div id="review-summary"></div>
+              <div class="privacy-callout">
+                <strong>Where your response goes</strong>
+                <p>When you select “Submit response,” the answers are sent directly to the project’s existing Google Form. The public GitHub repository stores only the questionnaire code—not responses.</p>
+              </div>
+              <div class="final-actions">
+                <button class="secondary-button" id="download-response" type="button">Download answer copy (.json)</button>
+                <button class="primary-button submit-button" id="submit-response" type="submit">
+                  <span>Submit response</span>
+                  <span aria-hidden="true">→</span>
+                </button>
+              </div>
+              <p class="submission-note" id="submission-note" role="status"></p>
+            </section>
+          </section>
+
+          <nav class="form-navigation" aria-label="Questionnaire navigation">
+            <button class="secondary-button" id="previous-step" type="button">← Back</button>
+            <span class="navigation-position" id="navigation-position">1 of 10</span>
+            <button class="primary-button" id="next-step" type="button">Next <span aria-hidden="true">→</span></button>
+          </nav>
+        </form>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <p>SCALA corn and livestock supply-chain field consultation · Working questionnaire</p>
+      <p>
+        <a href="https://github.com/MickeyRay0624/scala-farmer-survey/blob/main/SURVEY_LOGIC.md" target="_blank" rel="noopener">Survey logic</a>
+        ·
+        <a href="https://github.com/MickeyRay0624/scala-farmer-survey/blob/main/README.md" target="_blank" rel="noopener">Technical notes</a>
+      </p>
+    </footer>
+
+    <iframe name="google-response-frame" id="google-response-frame" title="Google Form submission response" hidden></iframe>
+    <form
+      id="google-transport-form"
+      action="https://docs.google.com/forms/d/e/1FAIpQLSchtHHQcFWIIhSaLELdh1xBC8LXdhgGVe387UPA7qAOmUZgNw/formResponse"
+      method="post"
+      target="google-response-frame"
+      hidden
+    ></form>
+
+    <dialog id="success-dialog" class="success-dialog">
+      <div class="success-icon" aria-hidden="true">✓</div>
+      <p class="eyebrow">Response sent</p>
+      <h2>Thank you for sharing your experience.</h2>
+      <p>Your response was sent to the project’s Google Form. The saved draft on this device has been cleared.</p>
+      <div class="dialog-actions">
+        <button class="secondary-button" id="download-submitted-response" type="button">Download answer copy</button>
+        <button class="primary-button" id="start-new-response" type="button">Start a new response</button>
+      </div>
+    </dialog>
+
+    <script src="app.js" defer></script>
+  </body>
+</html>
