@@ -1,9 +1,10 @@
-const CACHE_NAME = "scala-farmer-survey-v1";
+const CACHE_NAME = "scala-farmer-survey-v2";
 const OFFLINE_ASSETS = [
   "./",
   "./index.html",
   "./styles.css",
   "./app.js",
+  "./favicon.svg",
   "./assets/dindi-chatbot.png",
   "./assets/dindi-guide.png",
   "./source/EN_Semi_structured_questionnaire_1Sep.docx",
