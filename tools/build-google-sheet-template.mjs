@@ -238,22 +238,26 @@ transportSheet.getRange(`B5:B${config.transport_map.length + 5}`).format.fill = 
 
 const dashboard = addSheet("Dashboard");
 applyTitle(dashboard, "A1:H1", "TEST response dashboard", "Refresh via SCALA Tools → Rebuild analysis. TEST data must not be mixed with production interviews.");
-dashboard.getRange("A4:B9").values = [
+dashboard.getRange("A4:B11").values = [
   ["Metric", "Value"],
   ["Expanded responses", null],
   ["JSON answer values", null],
   ["Maize plot records", null],
   ["Livestock breed records", null],
   ["Climate event records", null],
+  ["Loss records", null],
+  ["Support and need records", null],
 ];
 dashboard.getRange("B5").formulas = [["=MAX(0,COUNTA('Responses_Wide'!A2:A10000))"]];
 dashboard.getRange("B6").formulas = [["=MAX(0,COUNTA('JSON_Long'!A2:A100000))"]];
 dashboard.getRange("B7").formulas = [["=MAX(0,COUNTA('Maize_Plots'!A2:A10000))"]];
 dashboard.getRange("B8").formulas = [["=MAX(0,COUNTA('Livestock_Breeds'!A2:A10000))"]];
 dashboard.getRange("B9").formulas = [["=MAX(0,COUNTA('Climate_Events'!A2:A10000))"]];
+dashboard.getRange("B10").formulas = [["=MAX(0,COUNTA('Losses'!A2:A10000))"]];
+dashboard.getRange("B11").formulas = [["=MAX(0,COUNTA('Support_Needs'!A2:A10000))"]];
 dashboard.getRange("A4:B4").format = { fill: colors.forest2, font: { bold: true, color: colors.white } };
-dashboard.getRange("A5:A9").format = { fill: colors.mint, font: { bold: true, color: colors.ink } };
-dashboard.getRange("B5:B9").format = { fill: colors.goldLight, font: { bold: true, color: colors.ink, size: 14 }, numberFormat: "#,##0", horizontalAlignment: "right" };
+dashboard.getRange("A5:A11").format = { fill: colors.mint, font: { bold: true, color: colors.ink } };
+dashboard.getRange("B5:B11").format = { fill: colors.goldLight, font: { bold: true, color: colors.ink, size: 14 }, numberFormat: "#,##0", horizontalAlignment: "right" };
 dashboard.getRange("A:A").format.columnWidth = 32;
 dashboard.getRange("B:B").format.columnWidth = 18;
 

@@ -37,7 +37,7 @@ for (const [sheetName, range] of sheets) {
 }
 
 const keyRanges = {};
-for (const [sheetName, range] of [["Dashboard", "A1:B9"], ["Questions", "A1:H10"], ["Transport_Map", "A1:E10"]]) {
+for (const [sheetName, range] of [["Dashboard", "A1:B11"], ["Questions", "A1:H10"], ["Transport_Map", "A1:E10"]]) {
   keyRanges[sheetName] = (await workbook.inspect({ kind: "table", range: `${sheetName}!${range}`, include: "values,formulas", tableMaxRows: 12, tableMaxCols: 10, maxChars: 5000 })).ndjson;
 }
 const errors = await workbook.inspect({ kind: "match", searchTerm: "#REF!|#DIV/0!|#VALUE!|#NAME\\?|#N/A", options: { useRegex: true, maxResults: 100 }, summary: "verification error scan" });
