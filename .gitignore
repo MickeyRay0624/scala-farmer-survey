@@ -1,1 +1,3 @@
 .DS_Store
+outputs/**/*.inspect.ndjson
+outputs/**/*-preview.png

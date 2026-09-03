@@ -4,7 +4,7 @@ Responsive web questionnaire for the Thailand SCALA corn and livestock supply-ch
 
 **Live survey:** <https://mickeyray0624.github.io/scala-farmer-survey/>
 
-The site is a static GitHub Pages application. Responses do **not** enter GitHub: the browser submits them to the project’s existing Google Form response store. The detailed web questionnaire is serialized into labelled JSON blocks inside the broad paragraph fields of that form, while key metadata and rating fields are mapped individually for easier analysis.
+The site is a static GitHub Pages application. Responses do **not** enter GitHub: the browser submits them to a selected Google Form response store. The detailed web questionnaire is serialized into labelled JSON blocks inside broad paragraph fields, while key metadata and rating fields are mapped individually. A Google Sheet configuration endpoint can now control wording, order, options, required status, and conditional display without editing the site code.
 
 ## Included
 
@@ -16,6 +16,8 @@ The site is a static GitHub Pages application. Responses do **not** enter GitHub
 - Offline page access after the first successful visit; submission still requires a connection
 - The original questionnaire at `source/EN_Semi_structured_questionnaire_1Sep.docx`
 - A review record of all inferred rules in `SURVEY_LOGIC.md`
+- A no-code Google Sheet maintenance guide in `CONFIGURATION_GUIDE_CN.md`
+- A private TEST workbook template plus Apps Script for form creation and JSON analysis
 
 ## Data flow
 
@@ -23,7 +25,7 @@ The site is a static GitHub Pages application. Responses do **not** enter GitHub
 Farmer or enumerator browser
   ├─ draft → this device's localStorage
   ├─ optional copy → JSON download on this device
-  └─ submit → existing Google Form → project-owned response spreadsheet
+  └─ submit → selected Google Form → private project response spreadsheet
 
 GitHub Pages
   └─ stores only HTML, CSS, JavaScript, images, and the source questionnaire
@@ -37,7 +39,7 @@ Directly mapped Google Form fields include interview metadata, selected demograp
 
 ```json
 {
-  "schema": "scala-farmer-survey-2026-09-02-v1",
+  "schema": "scala-farmer-survey-2026-09-03-v2",
   "section": "corn_water",
   "answers": {
     "m.m9_water_sources": ["Rainwater storage"],
@@ -46,7 +48,27 @@ Directly mapped Google Form fields include interview metadata, selected demograp
 }
 ```
 
-This preserves every detailed field without requiring changes to the existing Google Form. Analysts should parse the JSON paragraph cells before quantitative analysis. If the Google Form is later redesigned with one native field per question, update `buildGooglePayload()` in `app.js` and bump `SCHEMA_VERSION`.
+The supplied Apps Script expands the JSON automatically into `Responses_Wide`, `JSON_Long`, `Maize_Plots`, `Livestock_Breeds`, `Climate_Events`, `Losses`, and `Support_Needs`. It also generates a codebook and serves only the whitelisted questionnaire configuration to the public site.
+
+## No-code questionnaire editing
+
+The browser loads a reviewed bundled configuration first and can replace it with the Google Sheet configuration endpoint. The editable tables are:
+
+- `Sections`: section titles, order, and maize/livestock routing
+- `Questions`: top-level question visibility, wording, help, and order within a subsection
+- `Options`: visible option labels, order, exclusivity, and detail triggers
+- `Logic`: configurable show/hide rules
+- `Fields`: advanced field labels, required status, numeric constraints, and standard `custom.*` questions
+
+See `CONFIGURATION_GUIDE_CN.md` for the non-technical workflow and safety limits.
+
+## TEST manager workbook and Apps Script
+
+- Workbook: `outputs/scala-config-20260903/SCALA_Farmer_Survey_TEST_Manager.xlsx`
+- Apps Script: `google-apps-script/Code.gs`
+- Manifest: `google-apps-script/appsscript.json`
+
+The setup function creates an **unpublished** `[TEST]` Google Form and links it to the private workbook. Publishing is a separate deliberate step. The web endpoint returns configuration only; it never returns form responses or analysis data.
 
 ## Local preview
 
@@ -68,5 +90,5 @@ GitHub Pages is configured to deploy from the repository’s `main` branch root.
 - Never commit response exports or the Google response spreadsheet.
 - Review `SURVEY_LOGIC.md` before changing routing or option wording.
 - Change `CACHE_NAME` in `service-worker.js` whenever cached assets change materially.
-- Test one clearly labelled synthetic response after changing the Google Forms mapping.
-
+- Keep TEST and production Forms/Sheets fully separate.
+- Run 10–20 labelled test cases after changing the Google Form mapping, configuration structure, or Apps Script.

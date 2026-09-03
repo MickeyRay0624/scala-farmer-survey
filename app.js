@@ -1,8 +1,9 @@
-(() => {
+(async () => {
   "use strict";
 
-  const SCHEMA_VERSION = "scala-farmer-survey-2026-09-02-v1";
-  const DRAFT_KEY = `${SCHEMA_VERSION}:draft`;
+  const DEFAULT_SCHEMA_VERSION = "scala-farmer-survey-2026-09-03-v2";
+  const DRAFT_KEY = "scala-farmer-survey:draft";
+  let SCHEMA_VERSION = DEFAULT_SCHEMA_VERSION;
   const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
   const $ = (selector, root = document) => root.querySelector(selector);
@@ -1016,6 +1017,11 @@
 
   renderGeneratedContent();
 
+  const configRuntime = window.ScalaSurveyConfig
+    ? await window.ScalaSurveyConfig.loadAndApply()
+    : { entryMap: {}, formAction: "", submissionEnabled: true, settings: {}, configSource: "built-in" };
+  SCHEMA_VERSION = configRuntime.settings?.schema_version || DEFAULT_SCHEMA_VERSION;
+
   const surveyForm = $("#survey-form");
   const nextButton = $("#next-step");
   const previousButton = $("#previous-step");
@@ -1083,6 +1089,7 @@
 
     const modules = selectedValues("d.modules");
     setConditionalVisibility($("#l25-own-corn"), modules.includes("maize") && modules.includes("livestock"));
+    window.ScalaSurveyConfig?.applyLogic();
   }
 
   function updateRecordToggles() {
@@ -1260,7 +1267,7 @@
     } catch {
       return false;
     }
-    if (!draft || draft.version !== SCHEMA_VERSION || !draft.values) return false;
+    if (!draft || !draft.values) return false;
     Object.entries(draft.values).forEach(([name, stored]) => {
       $$(`[name="${CSS.escape(name)}"]`, surveyForm).forEach((control) => {
         if (control.type === "checkbox") control.checked = Array.isArray(stored) && stored.includes(control.value);
@@ -1434,76 +1441,126 @@
 
   function buildGooglePayload(answers) {
     const payload = new Map();
+    const defaultEntryMap = {
+      participant_id: "730105851",
+      interview_date: "586214593",
+      interview_location: "1064558567",
+      consent: "1548488798",
+      age: "614427163",
+      gender: "1518832350",
+      occupation: "1181406374",
+      farming_years: "292390039",
+      education: "1620154603",
+      ethnicity: "1033950094",
+      household_total: "5237903",
+      household_farm_workers: "1684320186",
+      land_tenure: "1550721741",
+      financial_status: "896028899",
+      agricultural_income_share: "732609465",
+      financial_stability: "1100989624",
+      province: "351154306",
+      district: "1461762649",
+      subdistrict: "156739556",
+      village: "1537917553",
+      json_general_and_community_context: "933991319",
+      json_community_membership: "578153089",
+      community_average_rating: "1775361658",
+      json_hopes_and_concerns: "2068025504",
+      concern_drought: "10100710",
+      concern_flood_landslide: "1217225293",
+      concern_heat: "716114873",
+      concern_disease_pests: "997853596",
+      concern_price_volatility: "68542505",
+      concern_input_cost: "1141402020",
+      concern_household_debt: "453910813",
+      concern_labor_shortage: "1393931812",
+      concern_soil_degradation: "61634773",
+      concern_land_rights: "1603426565",
+      json_corn_plot: "1949558594",
+      json_corn_soil_land: "1428930569",
+      json_corn_water: "996045301",
+      json_corn_soil_problems: "751586416",
+      json_corn_weeds_pests: "1227697557",
+      json_corn_calendar_weather_systems: "1842809632",
+      json_corn_varieties: "1490786184",
+      json_corn_harvest_market: "352198314",
+      json_livestock_farm: "329405922",
+      json_livestock_housing_land: "623361055",
+      json_livestock_water_feed: "889952861",
+      json_livestock_health: "1387521111",
+      json_livestock_climate: "549345395",
+      json_livestock_breeds_market: "692996229",
+      json_livestock_waste: "1448704257",
+      json_climate_history: "2053115840",
+      json_climate_losses: "1979045461",
+      json_adaptation_measures: "899733878",
+      json_support: "534112121",
+      additional_feedback: "2139126812",
+      follow_up: "1260236400",
+    };
+    const entryMap = { ...defaultEntryMap, ...(configRuntime.entryMap || {}) };
     const add = (name, value) => {
-      if (value !== undefined && value !== null && String(value) !== "") payload.set(name, String(value));
+      if (name && value !== undefined && value !== null && String(value) !== "") payload.set(name, String(value));
     };
-    add("entry.730105851", answers["meta.participant_id"]);
+    const addEntry = (key, value, suffix = "") => add(entryMap[key] ? `entry.${entryMap[key]}${suffix}` : "", value);
+
+    addEntry("participant_id", answers["meta.participant_id"]);
     const [year, month, day] = String(answers["meta.date"] || "").split("-");
-    add("entry.586214593_year", year);
-    add("entry.586214593_month", month);
-    add("entry.586214593_day", day);
-    add("entry.1064558567", answers["meta.location"]);
-    add("entry.1548488798", answers["meta.consent"]?.[0] || answers["meta.consent"]);
+    addEntry("interview_date", year, "_year");
+    addEntry("interview_date", month, "_month");
+    addEntry("interview_date", day, "_day");
+    addEntry("interview_location", answers["meta.location"]);
+    addEntry("consent", answers["meta.consent"]?.[0] || answers["meta.consent"]);
 
-    add("entry.614427163", answers["d.age"]);
-    add("entry.1518832350", answers["d.gender"]);
-    add("entry.1181406374", [answers["d.occupation"], answers["d.occupation_other"]].filter(Boolean).join(": "));
-    add("entry.292390039", answers["d.farming_years"]);
-    add("entry.1620154603", answers["d.education"]);
-    add("entry.1033950094", answers["d.ethnicity"]);
-    add("entry.5237903", answers["d.household_total"]);
-    add("entry.1684320186", answers["d.household_farm_workers"]);
-    add("entry.1550721741", joinValue(answers["d.land_tenure"]));
-    add("entry.896028899", answers["d.financial_status"]);
-    add("entry.732609465", answers["d.agricultural_income_share"]);
-    add("entry.1100989624", answers["d.financial_stability"]);
+    addEntry("age", answers["d.age"]);
+    addEntry("gender", answers["d.gender"]);
+    addEntry("occupation", [answers["d.occupation"], answers["d.occupation_other"]].filter(Boolean).join(": "));
+    addEntry("farming_years", answers["d.farming_years"]);
+    addEntry("education", answers["d.education"]);
+    addEntry("ethnicity", answers["d.ethnicity"]);
+    addEntry("household_total", answers["d.household_total"]);
+    addEntry("household_farm_workers", answers["d.household_farm_workers"]);
+    addEntry("land_tenure", joinValue(answers["d.land_tenure"]));
+    addEntry("financial_status", answers["d.financial_status"]);
+    addEntry("agricultural_income_share", answers["d.agricultural_income_share"]);
+    addEntry("financial_stability", answers["d.financial_stability"]);
 
-    add("entry.351154306", answers["c.province"]);
-    add("entry.1461762649", answers["c.district"]);
-    add("entry.156739556", answers["c.subdistrict"]);
-    add("entry.1537917553", answers["c.village"]);
-    add("entry.933991319", compactJson("general_and_community_context", answers, ["d.", "c.main_", "c.non_", "c.c5"]));
-    add("entry.578153089", compactJson("community_membership", answers, ["c.membership"]));
-    add("entry.1775361658", averageRatings(answers, "c.c5."));
+    addEntry("province", answers["c.province"]);
+    addEntry("district", answers["c.district"]);
+    addEntry("subdistrict", answers["c.subdistrict"]);
+    addEntry("village", answers["c.village"]);
+    addEntry("json_general_and_community_context", compactJson("general_and_community_context", answers, ["d.", "c.main_", "c.non_", "c.c5"]));
+    addEntry("json_community_membership", compactJson("community_membership", answers, ["c.membership"]));
+    addEntry("community_average_rating", averageRatings(answers, "c.c5."));
 
-    add("entry.2068025504", compactJson("hopes_and_concerns", answers, ["h.hope", "h.concern."]));
-    const concernEntryIds = {
-      drought: "10100710",
-      flood_landslide: "1217225293",
-      heat: "716114873",
-      disease_pests: "997853596",
-      price_volatility: "68542505",
-      input_cost: "1141402020",
-      household_debt: "453910813",
-      labor_shortage: "1393931812",
-      soil_degradation: "61634773",
-      land_rights: "1603426565",
-    };
-    Object.entries(concernEntryIds).forEach(([id, entry]) => add(`entry.${entry}`, answers[`h.concern_rating.${id}`]));
+    addEntry("json_hopes_and_concerns", compactJson("hopes_and_concerns", answers, ["h.hope", "h.concern."]));
+    ["drought", "flood_landslide", "heat", "disease_pests", "price_volatility", "input_cost", "household_debt", "labor_shortage", "soil_degradation", "land_rights"]
+      .forEach((id) => addEntry(`concern_${id}`, answers[`h.concern_rating.${id}`]));
 
-    add("entry.1949558594", compactJson("corn_plot", answers, ["m.plot", "m.m1", "m.m2", "m.m3", "m.coordinates"]));
-    add("entry.1428930569", compactJson("corn_soil_land", answers, ["m.m4", "m.m5", "m.m6", "m.m7", "m.m8"]));
-    add("entry.996045301", compactJson("corn_water", answers, ["m.m9", "m.m10", "m.m11", "m.m12"]));
-    add("entry.751586416", compactJson("corn_soil_problems", answers, ["m.m13"]));
-    add("entry.1227697557", compactJson("corn_weeds_pests", answers, ["m.m14", "m.m15", "m.m16", "m.m17", "m.m18"]));
-    add("entry.1842809632", compactJson("corn_calendar_weather_systems", answers, ["m.m19", "m.m20", "m.m21", "m.m22"]));
-    add("entry.1490786184", compactJson("corn_varieties", answers, ["m.m23", "m.m24", "m.m25", "m.m26"]));
-    add("entry.352198314", compactJson("corn_harvest_market", answers, ["m.m27", "m.m28", "m.m29", "m.m30", "m.m31", "m.m32", "m.m33"]));
+    addEntry("json_corn_plot", compactJson("corn_plot", answers, ["m.plot", "m.m1", "m.m2", "m.m3", "m.coordinates"]));
+    addEntry("json_corn_soil_land", compactJson("corn_soil_land", answers, ["m.m4", "m.m5", "m.m6", "m.m7", "m.m8"]));
+    addEntry("json_corn_water", compactJson("corn_water", answers, ["m.m9", "m.m10", "m.m11", "m.m12"]));
+    addEntry("json_corn_soil_problems", compactJson("corn_soil_problems", answers, ["m.m13"]));
+    addEntry("json_corn_weeds_pests", compactJson("corn_weeds_pests", answers, ["m.m14", "m.m15", "m.m16", "m.m17", "m.m18"]));
+    addEntry("json_corn_calendar_weather_systems", compactJson("corn_calendar_weather_systems", answers, ["m.m19", "m.m20", "m.m21", "m.m22"]));
+    addEntry("json_corn_varieties", compactJson("corn_varieties", answers, ["m.m23", "m.m24", "m.m25", "m.m26"]));
+    addEntry("json_corn_harvest_market", compactJson("corn_harvest_market", answers, ["m.m27", "m.m28", "m.m29", "m.m30", "m.m31", "m.m32", "m.m33"]));
 
-    add("entry.329405922", compactJson("livestock_farm", answers, ["l.l1", "l.l2", "l.l3", "l.l4", "l.l5", "l.l6", "l.l7"]));
-    add("entry.623361055", compactJson("livestock_housing_land", answers, ["l.l8", "l.l9", "l.l10", "l.l11", "l.l12"]));
-    add("entry.889952861", compactJson("livestock_water_feed", answers, ["l.l13", "l.l14", "l.l15", "l.l22", "l.l23", "l.l24", "l.l25"]));
-    add("entry.1387521111", compactJson("livestock_health", answers, ["l.l26", "l.l27", "l.l28", "l.l29", "l.l30"]));
-    add("entry.549345395", compactJson("livestock_climate", answers, ["l.l31", "l.l32", "l.l33"]));
-    add("entry.692996229", compactJson("livestock_breeds_market", answers, ["l.l34", "l.l35", "l.l36", "l.l37", "l.l38", "l.l39", "l.l40", "l.l41", "l.l42", "l.l43", "l.l44", "l.l45"]));
-    add("entry.1448704257", compactJson("livestock_waste", answers, ["l.l46", "l.l47", "l.l48"]));
+    addEntry("json_livestock_farm", compactJson("livestock_farm", answers, ["l.l1", "l.l2", "l.l3", "l.l4", "l.l5", "l.l6", "l.l7"]));
+    addEntry("json_livestock_housing_land", compactJson("livestock_housing_land", answers, ["l.l8", "l.l9", "l.l10", "l.l11", "l.l12"]));
+    addEntry("json_livestock_water_feed", compactJson("livestock_water_feed", answers, ["l.l13", "l.l14", "l.l15", "l.l22", "l.l23", "l.l24", "l.l25"]));
+    addEntry("json_livestock_health", compactJson("livestock_health", answers, ["l.l26", "l.l27", "l.l28", "l.l29", "l.l30"]));
+    addEntry("json_livestock_climate", compactJson("livestock_climate", answers, ["l.l31", "l.l32", "l.l33"]));
+    addEntry("json_livestock_breeds_market", compactJson("livestock_breeds_market", answers, ["l.l34", "l.l35", "l.l36", "l.l37", "l.l38", "l.l39", "l.l40", "l.l41", "l.l42", "l.l43", "l.l44", "l.l45"]));
+    addEntry("json_livestock_waste", compactJson("livestock_waste", answers, ["l.l46", "l.l47", "l.l48"]));
 
-    add("entry.2053115840", compactJson("climate_history", answers, ["a.a1", "a.a2"]));
-    add("entry.1979045461", compactJson("climate_losses", answers, ["a.a3"]));
-    add("entry.899733878", compactJson("adaptation_measures", answers, ["n.n1"]));
-    add("entry.534112121", compactJson("support", answers, ["n.n2", "n.n3", "n.n4"]));
-    add("entry.2139126812", answers["z.additional_feedback"]);
-    add("entry.1260236400", answers["z.follow_up"]);
+    addEntry("json_climate_history", compactJson("climate_history", answers, ["a.a1", "a.a2"]));
+    addEntry("json_climate_losses", compactJson("climate_losses", answers, ["a.a3"]));
+    addEntry("json_adaptation_measures", compactJson("adaptation_measures", answers, ["n.n1"]));
+    addEntry("json_support", compactJson("support", answers, ["n.n2", "n.n3", "n.n4"]));
+    addEntry("json_custom", compactJson("custom_questions", answers, ["custom."]));
+    addEntry("additional_feedback", answers["z.additional_feedback"]);
+    addEntry("follow_up", answers["z.follow_up"]);
     add("fvv", "1");
     add("pageHistory", "0");
     add("submissionTimestamp", "-1");
@@ -1586,9 +1643,13 @@
   function updateConnectionStatus() {
     const status = $("#connection-status");
     const text = $("span:last-child", status);
+    const configured = configRuntime.submissionEnabled !== false && Boolean($("#google-transport-form")?.action);
     status.classList.toggle("is-offline", !navigator.onLine);
-    text.textContent = navigator.onLine ? "Online · ready to submit" : "Offline · draft will stay on this device";
-    if (!submissionInProgress) submitButton.disabled = !navigator.onLine;
+    status.classList.toggle("is-unconfigured", !configured);
+    if (!configured) text.textContent = `${configRuntime.environment === "test" ? "Test" : "Survey"} receiver is not configured`;
+    else if (navigator.onLine) text.textContent = `${configRuntime.environment === "test" ? "TEST · " : ""}Online · ready to submit`;
+    else text.textContent = "Offline · draft will stay on this device";
+    if (!submissionInProgress) submitButton.disabled = !navigator.onLine || !configured;
   }
 
   nextButton.addEventListener("click", () => {
@@ -1630,6 +1691,10 @@
 
   surveyForm.addEventListener("submit", (event) => {
     event.preventDefault();
+    if (configRuntime.submissionEnabled === false || !$("#google-transport-form")?.action) {
+      setSubmissionState("This survey receiver is not configured. Ask the project administrator to check the Google Sheet settings.", "error");
+      return;
+    }
     if (!navigator.onLine) {
       setSubmissionState("You are offline. The draft is safe on this device; submit when the connection returns.", "error");
       return;
@@ -1690,6 +1755,9 @@
 
   window.__surveyDebug = {
     schemaVersion: SCHEMA_VERSION,
+    environment: configRuntime.environment,
+    configSource: configRuntime.configSource,
+    configuredEntryCount: Object.keys(configRuntime.entryMap || {}).length,
     collectAnswers,
     buildGooglePayload: () => Object.fromEntries(buildGooglePayload(collectAnswers())),
     visibleStepKeys: () => visibleSteps().map((step) => step.dataset.step),

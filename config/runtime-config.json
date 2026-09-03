@@ -1,0 +1,16 @@
+{
+  "default_environment": "production",
+  "environments": {
+    "production": {
+      "enabled": true,
+      "config_url": "",
+      "form_action": "https://docs.google.com/forms/d/e/1FAIpQLSchtHHQcFWIIhSaLELdh1xBC8LXdhgGVe387UPA7qAOmUZgNw/formResponse"
+    },
+    "test": {
+      "enabled": false,
+      "config_url": "",
+      "form_action": "",
+      "notice": "The independent test receiver has not been connected yet."
+    }
+  }
+}
