@@ -1,4 +1,4 @@
-const CACHE_NAME = "scala-farmer-survey-v3";
+const CACHE_NAME = "scala-farmer-survey-v4";
 const OFFLINE_ASSETS = [
   "./",
   "./index.html",
@@ -30,6 +30,21 @@ self.addEventListener("activate", (event) => {
 self.addEventListener("fetch", (event) => {
   const requestUrl = new URL(event.request.url);
   if (event.request.method !== "GET" || requestUrl.origin !== self.location.origin) return;
+
+  if (requestUrl.pathname.endsWith("/config/runtime-config.json")) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response.ok) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request)),
+    );
+    return;
+  }
 
   event.respondWith(
     caches.match(event.request).then((cached) => {
