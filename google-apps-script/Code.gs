@@ -16,7 +16,7 @@ const SCALA_CONFIG = Object.freeze({
   configSheets: ['Settings', 'Sections', 'Questions', 'Fields', 'Options', 'Logic', 'Transport_Map'],
   outputSheets: ['Responses_Wide', 'JSON_Long', 'Maize_Plots', 'Livestock_Breeds', 'Climate_Events', 'Losses', 'Support_Needs'],
   protectedSheetNames: [
-    'README', 'Settings', 'Sections', 'Questions', 'Fields', 'Options', 'Logic', 'Transport_Map',
+    'README', 'START_HERE', 'Settings', 'Sections', 'Questions', 'Fields', 'Options', 'Logic', 'Transport_Map',
     'Dashboard', 'Responses_Wide', 'JSON_Long', 'Maize_Plots', 'Livestock_Breeds',
     'Climate_Events', 'Losses', 'Support_Needs', 'Codebook',
   ],
@@ -40,6 +40,8 @@ function onOpen() {
       .addItem('2 · Publish TEST form', 'publishTestForm')
       .addItem('3 · Verify Google Form field mapping', 'refreshTransportMap')
       .addSeparator()
+      .addItem('Use simple editor view', 'prepareEditorWorkspace')
+      .addItem('Show technical columns', 'showTechnicalColumns')
       .addItem('Rebuild all analysis', 'rebuildAnalysis')
       .addItem('Refresh codebook', 'refreshCodebook')
       .addItem('Show TEST links', 'showTestLinks')
@@ -130,6 +132,7 @@ function bootstrapTestEnvironment() {
 
     form.setDestination(FormApp.DestinationType.SPREADSHEET, ss.getId());
     installSubmitTrigger_(ss);
+    installOpenTrigger_(ss);
 
     const publicUrl = form.getPublishedUrl();
     const formAction = publicUrl.replace(/viewform(?:\?.*)?$/, 'formResponse');
@@ -141,6 +144,7 @@ function bootstrapTestEnvironment() {
     updateSetting_('response_sheet_url', ss.getUrl());
     updateSetting_('submission_enabled', 'FALSE');
     writeTable_('Transport_Map', created);
+    prepareEditorWorkspace_();
     SpreadsheetApp.flush();
 
     notify_(
@@ -246,6 +250,227 @@ function showTestLinks() {
     `Configuration endpoint: ${getSetting_('config_url') || 'deploy this script as a web app'}`,
   ];
   notify_('SCALA TEST links', lines.join('\n\n'));
+}
+
+/** Makes the no-code editor easy to find and use in both bound and standalone projects. */
+function prepareEditorWorkspace() {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(30000);
+  try {
+    const ss = getSpreadsheet_();
+    installOpenTrigger_(ss);
+    prepareEditorWorkspace_();
+    notify_('Editor workspace ready', 'Reload this Google Sheet. START_HERE and the green editor tabs now appear first.');
+  } finally {
+    lock.releaseLock();
+  }
+}
+
+/** Installs the SCALA Tools menu for a standalone Apps Script project. */
+function installAdminMenuTrigger() {
+  const ss = getSpreadsheet_();
+  installOpenTrigger_(ss);
+  prepareEditorWorkspace_();
+  notify_('SCALA Tools installed', 'Reload the Google Sheet once. The SCALA Tools menu will appear at the top.');
+}
+
+function installOpenTrigger_(spreadsheet) {
+  const exists = ScriptApp.getProjectTriggers().some((trigger) =>
+    trigger.getHandlerFunction() === 'onOpen' && trigger.getTriggerSourceId() === spreadsheet.getId());
+  if (!exists) {
+    ScriptApp.newTrigger('onOpen')
+      .forSpreadsheet(spreadsheet)
+      .onOpen()
+      .create();
+  }
+}
+
+function prepareEditorWorkspace_() {
+  const ss = getSpreadsheet_();
+  ss.setSpreadsheetLocale('en_US');
+
+  let startSheet = ss.getSheetByName('START_HERE');
+  const legacyStartSheet = ss.getSheetByName('README');
+  if (!startSheet && legacyStartSheet) startSheet = legacyStartSheet.setName('START_HERE');
+  if (!startSheet) startSheet = ss.insertSheet('START_HERE');
+
+  const rawSheets = findRawResponseSheets_();
+  rawSheets.forEach((sheet, index) => {
+    const targetName = index === 0 ? 'Form_Responses' : `Form_Responses_${index + 1}`;
+    const conflict = ss.getSheetByName(targetName);
+    if (sheet.getName() !== targetName && !conflict) sheet.setName(targetName);
+  });
+
+  const preferredOrder = [
+    'START_HERE', 'Questions', 'Fields', 'Options', 'Sections', 'Logic', 'Dashboard',
+    'Form_Responses', 'Responses_Wide', 'JSON_Long', 'Maize_Plots', 'Livestock_Breeds',
+    'Climate_Events', 'Losses', 'Support_Needs', 'Codebook', 'Settings', 'Transport_Map',
+  ];
+  preferredOrder.forEach((name, index) => {
+    const sheet = ss.getSheetByName(name);
+    if (!sheet) return;
+    ss.setActiveSheet(sheet);
+    ss.moveActiveSheet(index + 1);
+  });
+
+  const green = '#2E7D32';
+  const amber = '#D99A2B';
+  const blue = '#2F6F9F';
+  const red = '#B85450';
+  const gray = '#7A848C';
+  ['Questions', 'Fields', 'Options', 'Sections'].forEach((name) => ss.getSheetByName(name)?.setTabColor(green));
+  ss.getSheetByName('START_HERE')?.setTabColor('#17473A');
+  ss.getSheetByName('Logic')?.setTabColor(amber);
+  ['Dashboard', 'Responses_Wide', 'JSON_Long', 'Maize_Plots', 'Livestock_Breeds', 'Climate_Events', 'Losses', 'Support_Needs']
+    .forEach((name) => ss.getSheetByName(name)?.setTabColor(blue));
+  ss.getSheetByName('Form_Responses')?.setTabColor(red);
+  ['Codebook', 'Settings', 'Transport_Map'].forEach((name) => ss.getSheetByName(name)?.setTabColor(gray));
+
+  styleEditorSheet_(ss.getSheetByName('Questions'), ['A', 'E', 'F', 'G', 'H'],
+    'Routine editors: change only green cells. Use Fields for individual input labels. Keep block_id, section_id, and segment_id unchanged.',
+    'Questions · main editor', [[2, 3]]);
+  styleEditorSheet_(ss.getSheetByName('Fields'), ['A', 'E', 'H', 'I', 'J', 'K', 'L', 'M', 'Q'],
+    'Routine editors: use green cells for labels, order, required status, placeholders, and numeric limits. Never change an existing question_id.',
+    'Fields · question editor', [[2, 3], [6, 2], [14, 3]]);
+  styleEditorSheet_(ss.getSheetByName('Options'), ['A', 'C', 'E', 'H'],
+    'Routine editors: use green cells for enabled, option_order, and option_label. Keep question_id and option_value stable after collection begins.',
+    'Options · main editor', [[2, 1], [4, 1], [6, 2]]);
+  styleEditorSheet_(ss.getSheetByName('Sections'), ['A', 'C', 'D', 'E', 'F', 'H'],
+    'Routine editors: use green cells for visibility, order, headings, descriptions, and notes. Change module routing only with technical review.',
+    'Sections · main editor', [[2, 1], [7, 1]]);
+  styleLogicSheet_(ss.getSheetByName('Logic'));
+  writeStartHere_(ss, startSheet);
+  ss.setActiveSheet(startSheet);
+}
+
+function styleEditorSheet_(sheet, editableColumns, instruction, title, hiddenColumnGroups) {
+  if (!sheet) return;
+  sheet.setFrozenRows(4);
+  sheet.setHiddenGridlines(true);
+  sheet.getRange('A1').setValue(title);
+  sheet.getRange('A2').setValue(instruction);
+  const lastRow = Math.max(sheet.getLastRow(), 5);
+  const lastColumn = Math.max(sheet.getLastColumn(), 1);
+  sheet.getRange(5, 1, lastRow - 4, lastColumn).setBackground('#F1F3F4');
+  sheet.getRangeList(editableColumns.map((column) => `${column}5:${column}${lastRow}`)).setBackground('#E6F4EA');
+  sheet.showColumns(1, sheet.getMaxColumns());
+  hiddenColumnGroups.forEach(([startColumn, numberOfColumns]) => sheet.hideColumns(startColumn, numberOfColumns));
+}
+
+function styleLogicSheet_(sheet) {
+  if (!sheet) return;
+  sheet.setFrozenRows(4);
+  sheet.setHiddenGridlines(true);
+  sheet.getRange('A1').setValue('Logic · advanced editor');
+  sheet.getRange('A2').setValue('Advanced editor: each row controls conditional display. Test every changed rule in the TEST survey before production use.');
+  const lastRow = Math.max(sheet.getLastRow(), 5);
+  const lastColumn = Math.max(sheet.getLastColumn(), 1);
+  sheet.getRange(5, 1, lastRow - 4, lastColumn).setBackground('#FFF4D6');
+}
+
+function showTechnicalColumns() {
+  const ss = getSpreadsheet_();
+  ['Questions', 'Fields', 'Options', 'Sections'].forEach((name) => {
+    const sheet = ss.getSheetByName(name);
+    if (sheet) sheet.showColumns(1, sheet.getMaxColumns());
+  });
+  notify_('Technical columns visible', 'All editor columns are visible. Use SCALA Tools → Use simple editor view to hide IDs again.');
+}
+
+function writeStartHere_(ss, sheet) {
+  const forest = '#173F35';
+  const forest2 = '#245A49';
+  const mint = '#E7F1EC';
+  const mint2 = '#F4F8F6';
+  const gold = '#E5AC50';
+  const goldLight = '#FFF3D8';
+  const ink = '#1F2933';
+  const line = '#D5E1DB';
+  const redLight = '#FDE8E7';
+  const sheetUrl = ss.getUrl();
+  const testSurveyUrl = 'https://mickeyray0624.github.io/scala-farmer-survey/?environment=test';
+  const scriptUrl = `https://script.google.com/home/projects/${ScriptApp.getScriptId()}/edit`;
+  const guideUrl = 'https://github.com/MickeyRay0624/scala-farmer-survey/blob/main/CONFIGURATION_GUIDE.md';
+
+  sheet.getRange('A1:H35').breakApart().clearContent().clearFormat().clearNote();
+  sheet.setHiddenGridlines(true);
+  sheet.setFrozenRows(7);
+  sheet.setColumnWidth(1, 190);
+  sheet.setColumnWidth(2, 620);
+  sheet.setColumnWidth(3, 150);
+  for (let column = 4; column <= 8; column += 1) sheet.setColumnWidth(column, 70);
+
+  const mergedRows = [1, 2, 4, 5, 7, 19, 24, 34, 35];
+  mergedRows.forEach((row) => sheet.getRange(row, 1, 1, 8).merge());
+  sheet.getRange('A1').setValue('SCALA Farmer Survey · TEST Manager');
+  sheet.getRange('A2').setValue('Private response workbook · no-code questionnaire editor · automatic JSON analysis');
+  sheet.getRange('A4').setValue('STATUS: READY — This TEST environment is already installed');
+  sheet.getRange('A5').setValue('Do not run the setup again. Use the quick links below for daily editing and testing.');
+  sheet.getRange('A7').setValue('QUICK LINKS');
+
+  const quickLinks = [
+    [testSurveyUrl, 'Open TEST survey', 'Fill and submit a TEST interview.', 'Everyone'],
+    [`${sheetUrl}#gid=${ss.getSheetByName('Questions').getSheetId()}`, 'Open Questions', 'Edit top-level headings, help text, visibility, and order.', 'Daily editor'],
+    [`${sheetUrl}#gid=${ss.getSheetByName('Fields').getSheetId()}`, 'Open Fields', 'Edit individual question labels, required status, and input limits.', 'Daily editor'],
+    [`${sheetUrl}#gid=${ss.getSheetByName('Options').getSheetId()}`, 'Open Options', 'Edit visible choice labels and their order.', 'Daily editor'],
+    [`${sheetUrl}#gid=${ss.getSheetByName('Sections').getSheetId()}`, 'Open Sections', 'Edit major section titles, descriptions, and order.', 'Daily editor'],
+    [`${sheetUrl}#gid=${ss.getSheetByName('Logic').getSheetId()}`, 'Open Logic', 'Edit conditional display rules and retest every affected route.', 'Advanced editor'],
+    [`${sheetUrl}#gid=${ss.getSheetByName('Dashboard').getSheetId()}`, 'Open Dashboard', 'Check response and analysis counts.', 'Reviewer'],
+    [getSetting_('form_edit_url') || getSetting_('form_public_url'), 'Open TEST Form editor', 'Inspect the private Google Form receiver.', 'Administrator'],
+    [scriptUrl, 'Open Apps Script', 'Run administrative functions or update the script.', 'Administrator'],
+    [guideUrl, 'Open administration guide', 'Read the complete no-code and first-time setup instructions.', 'Everyone'],
+  ];
+  sheet.getRange('A8:C17').setValues(quickLinks.map((item) => [item[1], item[2], item[3]]));
+  quickLinks.forEach((item, index) => {
+    if (item[0]) sheet.getRange(8 + index, 1).setFormula(`=HYPERLINK("${item[0]}","${item[1]}")`);
+  });
+
+  sheet.getRange('A19').setValue('DAILY EDITING — THREE STEPS');
+  sheet.getRange('A20:C22').setValues([
+    ['1', 'Open the relevant green tab and locate the current question or option.', 'Editor'],
+    ['2', 'Edit only green cells. Technical columns are hidden; show them from SCALA Tools only when needed.', 'Editor'],
+    ['3', 'Wait up to five minutes, refresh the TEST survey, and submit a labelled QA response.', 'Editor + reviewer'],
+  ]);
+
+  sheet.getRange('A24').setValue('FIRST-TIME SETUP — ONLY FOR A COMPLETELY NEW COPY');
+  sheet.getRange('A25:C32').setValues([
+    ['1', 'Import the manager workbook as a native Google Sheet and keep it private.', 'Technical owner'],
+    ['2', 'Open Extensions → Apps Script and add Code.gs plus appsscript.json.', 'Technical owner'],
+    ['3', 'For a standalone script, set SCALA_SPREADSHEET_ID and run installAdminMenuTrigger().', 'Technical owner'],
+    ['4', 'Reload the Sheet; choose SCALA Tools → 1 · Create isolated TEST form and authorize it.', 'Technical owner'],
+    ['5', 'Inspect the new Form; then choose SCALA Tools → 2 · Publish TEST form.', 'Technical owner'],
+    ['6', 'Deploy Apps Script as a Web app: Execute as me; access: Anyone.', 'Technical owner'],
+    ['7', 'Copy the /exec URL into Settings → config_url and the website TEST runtime configuration.', 'Technical owner'],
+    ['8', 'Submit a QA response and confirm Responses_Wide.parse_status is OK.', 'Technical owner'],
+  ]);
+
+  sheet.getRange('A34').setValue('SAFETY');
+  sheet.getRange('A35').setValue('Keep this workbook private. Never reuse a TEST Form or TEST Sheet for production interviews, and never commit response exports to GitHub.');
+
+  sheet.getRange('A1:H1').setBackground(forest).setFontColor('#FFFFFF').setFontSize(18).setFontWeight('bold').setVerticalAlignment('middle');
+  sheet.getRange('A2:H2').setBackground(mint).setFontColor(ink).setFontStyle('italic').setWrap(true);
+  sheet.getRange('A4:H4').setBackground('#DDEFE3').setFontColor(forest).setFontSize(14).setFontWeight('bold');
+  sheet.getRange('A5:H5').setBackground(mint2).setFontColor(ink).setFontWeight('bold');
+  ['A7:H7', 'A19:H19', 'A24:H24'].forEach((range) => sheet.getRange(range).setBackground(forest2).setFontColor('#FFFFFF').setFontWeight('bold'));
+  sheet.getRange('A8:A17').setBackground(mint).setFontWeight('bold');
+  sheet.getRange('B8:C17').setBackground('#FFFFFF').setWrap(true).setVerticalAlignment('top');
+  sheet.getRange('A8:C17').setBorder(true, true, true, true, true, true, line, SpreadsheetApp.BorderStyle.SOLID);
+  sheet.getRange('A20:A22').setBackground(forest2).setFontColor('#FFFFFF').setFontWeight('bold').setHorizontalAlignment('center');
+  sheet.getRange('B20:C22').setBackground(mint2).setWrap(true);
+  sheet.getRange('A20:C22').setBorder(true, true, true, true, true, true, line, SpreadsheetApp.BorderStyle.SOLID);
+  sheet.getRange('A25:A32').setBackground(gold).setFontColor(ink).setFontWeight('bold').setHorizontalAlignment('center');
+  sheet.getRange('B25:C32').setBackground(goldLight).setWrap(true);
+  sheet.getRange('A25:C32').setBorder(true, true, true, true, true, true, line, SpreadsheetApp.BorderStyle.SOLID);
+  sheet.getRange('A34:H34').setBackground('#B85450').setFontColor('#FFFFFF').setFontWeight('bold');
+  sheet.getRange('A35:H35').setBackground(redLight).setFontColor(ink).setWrap(true);
+  sheet.getRange('A1:H35').setVerticalAlignment('middle');
+  sheet.setRowHeight(1, 38);
+  sheet.setRowHeight(2, 34);
+  sheet.setRowHeight(4, 32);
+  sheet.setRowHeight(5, 30);
+  for (let row = 8; row <= 17; row += 1) sheet.setRowHeight(row, 40);
+  for (let row = 25; row <= 32; row += 1) sheet.setRowHeight(row, 42);
+  sheet.setRowHeight(35, 38);
 }
 
 function installSubmitTrigger_(spreadsheet) {

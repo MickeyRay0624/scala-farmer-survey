@@ -2,7 +2,11 @@
 
 Responsive web questionnaire for the Thailand SCALA corn and livestock supply-chain field consultation.
 
-**Live survey:** <https://mickeyray0624.github.io/scala-farmer-survey/>
+**Production survey:** <https://mickeyray0624.github.io/scala-farmer-survey/>
+
+**Working TEST survey:** <https://mickeyray0624.github.io/scala-farmer-survey/?environment=test>
+
+**Private TEST manager Sheet:** <https://docs.google.com/spreadsheets/d/1DZyhnc7x4S8XZfyXCBkDs0NTx5s76eS7UfxMNm2PZvY/edit>
 
 The site is a static GitHub Pages application. Responses do **not** enter GitHub: the browser submits them to a selected Google Form response store. The detailed web questionnaire is serialized into labelled JSON blocks inside broad paragraph fields, while key metadata and rating fields are mapped individually. A Google Sheet configuration endpoint can now control wording, order, options, required status, and conditional display without editing the site code.
 
@@ -16,7 +20,7 @@ The site is a static GitHub Pages application. Responses do **not** enter GitHub
 - Offline page access after the first successful visit; submission still requires a connection
 - The original questionnaire at `source/EN_Semi_structured_questionnaire_1Sep.docx`
 - A review record of all inferred rules in `SURVEY_LOGIC.md`
-- A no-code Google Sheet maintenance guide in `CONFIGURATION_GUIDE_CN.md`
+- An English no-code Google Sheet maintenance guide in `CONFIGURATION_GUIDE.md`
 - A private TEST workbook template plus Apps Script for form creation and JSON analysis
 
 ## Data flow
@@ -52,23 +56,37 @@ The supplied Apps Script expands the JSON automatically into `Responses_Wide`, `
 
 ## No-code questionnaire editing
 
-The browser loads a reviewed bundled configuration first and can replace it with the Google Sheet configuration endpoint. The editable tables are:
+The current TEST environment is already installed. Open the private manager Sheet and begin on `START_HERE`; do not repeat the one-time setup. The daily editor tabs are placed first and color coded:
 
-- `Sections`: section titles, order, and maize/livestock routing
-- `Questions`: top-level question visibility, wording, help, and order within a subsection
-- `Options`: visible option labels, order, exclusivity, and detail triggers
-- `Logic`: configurable show/hide rules
-- `Fields`: advanced field labels, required status, numeric constraints, and standard `custom.*` questions
+- `Questions`: top-level block headings, help text, visibility, and order
+- `Fields`: individual question labels, required status, placeholders, and numeric limits
+- `Options`: visible option labels and order
+- `Sections`: section titles and order
+- `Logic`: conditional show/hide rules; edit with additional care
 
-See `CONFIGURATION_GUIDE_CN.md` for the non-technical workflow and safety limits.
+Green cells are intended for routine edits. Technical ID columns are hidden by default; use `SCALA Tools → Show technical columns` only for advanced work, then return to `Use simple editor view`. Changes appear on the TEST site after the remote configuration is refreshed; allow up to five minutes, refresh the page, and submit a labelled QA response.
 
-## TEST manager workbook and Apps Script
+See `CONFIGURATION_GUIDE.md` for exact column instructions, testing steps, analysis tabs, and safety limits.
+
+## Current TEST environment
+
+The current TEST Form, response Sheet, configuration endpoint, response-expansion trigger, and field mapping are already operational. Day-to-day questionnaire editors need only the private Google Sheet and the TEST survey link.
+
+The Google Sheet exposes a `SCALA Tools` menu for administrator actions:
+
+- `Rebuild all analysis` after bulk imports or structural repair;
+- `Show TEST links` to retrieve the current Form and configuration links;
+- `3 · Verify Google Form field mapping` only after receiver fields are added, removed, or rebuilt in Google Forms.
+
+## Creating a completely new environment
 
 - Workbook: `outputs/scala-config-20260903/SCALA_Farmer_Survey_TEST_Manager.xlsx`
 - Apps Script: `google-apps-script/Code.gs`
 - Manifest: `google-apps-script/appsscript.json`
 
-The setup function creates an **unpublished** `[TEST]` Google Form and links it to the private workbook. Publishing is a separate deliberate step. Publishing also replaces provisional Forms item IDs with the verified `entry.*` IDs required by the public submission endpoint. After changing receiver fields in Google Forms, run `refreshTransportMap()` before resuming collection. The web endpoint returns configuration only; it never returns form responses or analysis data.
+This setup is needed only when a technical owner creates another isolated TEST or production environment. Import the manager workbook as a private native Google Sheet, add the Apps Script, run `bootstrapTestEnvironment()`, review and publish the generated Form, deploy the configuration web app, connect its `/exec` URL to the website, and submit a labelled QA response. The detailed click-by-click procedure is in `CONFIGURATION_GUIDE.md`.
+
+The setup function initially creates an unpublished `[TEST]` Google Form and links it to the private workbook. Publishing replaces provisional Forms item IDs with verified `entry.*` IDs required by the public submission endpoint. The configuration endpoint returns configuration only; it never returns Form responses or analysis data.
 
 ## Local preview
 

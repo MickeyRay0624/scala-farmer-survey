@@ -9,14 +9,12 @@ if (!workbookPath || !previewDir) throw new Error("Usage: verify-google-sheet-te
 await fs.mkdir(previewDir, { recursive: true });
 const workbook = await SpreadsheetFile.importXlsx(await FileBlob.load(workbookPath));
 const sheets = [
-  ["README", "A1:H20"],
-  ["Settings", "A1:C16"],
-  ["Sections", "A1:H14"],
+  ["START_HERE", "A1:H24"],
   ["Questions", "A1:H16"],
-  ["Options", "A1:H14"],
-  ["Logic", "A1:J14"],
   ["Fields", "A1:Q12"],
-  ["Transport_Map", "A1:E14"],
+  ["Options", "A1:H14"],
+  ["Sections", "A1:H14"],
+  ["Logic", "A1:J14"],
   ["Dashboard", "A1:H12"],
   ["Responses_Wide", "A1:G4"],
   ["JSON_Long", "A1:L4"],
@@ -26,6 +24,8 @@ const sheets = [
   ["Losses", "A1:G4"],
   ["Support_Needs", "A1:J4"],
   ["Codebook", "A1:I12"],
+  ["Settings", "A1:C16"],
+  ["Transport_Map", "A1:E14"],
 ];
 
 const outputs = [];
@@ -37,7 +37,7 @@ for (const [sheetName, range] of sheets) {
 }
 
 const keyRanges = {};
-for (const [sheetName, range] of [["Dashboard", "A1:B11"], ["Questions", "A1:H10"], ["Transport_Map", "A1:E10"]]) {
+for (const [sheetName, range] of [["START_HERE", "A1:C24"], ["Dashboard", "A1:B11"], ["Questions", "A1:H10"], ["Transport_Map", "A1:E10"]]) {
   keyRanges[sheetName] = (await workbook.inspect({ kind: "table", range: `${sheetName}!${range}`, include: "values,formulas", tableMaxRows: 12, tableMaxCols: 10, maxChars: 5000 })).ndjson;
 }
 const errors = await workbook.inspect({ kind: "match", searchTerm: "#REF!|#DIV/0!|#VALUE!|#NAME\\?|#N/A", options: { useRegex: true, maxResults: 100 }, summary: "verification error scan" });

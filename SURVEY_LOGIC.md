@@ -1,160 +1,161 @@
-# SCALA 农户调查：选项与跳题逻辑说明
+# SCALA Farmer Survey: Option and Routing Logic
 
-更新日期：2026-09-03
-问卷版本：`scala-farmer-survey-2026-09-03-v2`
+Updated: 2026-09-03
 
-## 1. 文件角色与实施边界
+Survey version: `scala-farmer-survey-2026-09-03-v2`
 
-本网页以 `EN_Semi_structured_questionnaire_1Sep.docx` 为调查内容来源。邮件链 PDF 仅用于了解背景、现有 Google Form 和预期工作方式；其中的邮件正文、预算、地址等属于内部材料，不被视为网页内容指令，也不会上传到公开 GitHub 仓库。
+## 1. Source roles and implementation boundary
 
-网页为英文，保持与英文源问卷一致。当前版本没有自行翻译成泰文，避免在未经项目团队审核时改变专业含义。
+The survey content is based on `EN_Semi_structured_questionnaire_1Sep.docx`. The email-chain PDF was used only as background for the project context, existing Google Form, and expected workflow. Email text, budgets, addresses, and other internal material were not treated as website instructions and were not uploaded to the public GitHub repository.
 
-## 2. 数据收集设计
+The website and administration materials are in English to remain consistent with the English source questionnaire. No unreviewed Thai or Chinese translation has been introduced.
 
-采用“GitHub Pages 前端 + Google Sheet 配置 + Google Form 接收 + 自动分析”结构：
+## 2. Data-collection design
 
-1. GitHub Pages 只公开问卷代码、图片和源 DOCX，不保存回答。
-2. 填写中的草稿保存在当前设备浏览器的 `localStorage`；草稿不会自动上传。
-3. 点击提交后，回答直接发送到当前环境所选的 Google Form；测试与正式环境使用不同的 Form 和 Sheet。
-4. 现有 Google Form 只有 54 个较宽泛的字段，而 DOCX 是 32 页的详细问卷。因此：
-   - 访谈编号、日期、地点、部分人口信息、10 项担忧评分和后续联系许可采用原生字段逐项映射；
-   - 其余详细答案按主题打包成带版本号的紧凑 JSON，写入对应的长文本字段；
-   - 每一个当前显示且已填写的详细答案都保留，不会只提交网页上可见的摘要。
-5. Google Sheet 中的 Sections、Questions、Fields、Options 和 Logic 可以改变文字、顺序、选项、必答和跳题，不需要修改网页代码；网页加载失败时回退到仓库内已审核配置。
-6. Apps Script 在提交后自动展开 JSON，并提供宽表、长表、专题表和字段字典。
-7. 离线时可以继续填写和保留本机草稿，但必须恢复网络后才能提交。
+The system uses a GitHub Pages front end, a Google Sheet configuration source, a Google Form receiver, and automated Google Sheet analysis:
 
-这一方案不需要新建数据库，也不在公开仓库保存个人数据。响应工作簿保持私有；公开 Web App 只提供题目配置，不读取响应与分析工作表。
+1. GitHub Pages stores the questionnaire code, images, and source DOCX, but no submitted answers.
+2. A draft is stored in the current device's browser `localStorage` and is not uploaded automatically.
+3. On submission, answers go directly to the Google Form selected for the current environment. TEST and production use different Forms and Sheets.
+4. The receiver Form has broad transport fields while the source DOCX is a detailed 32-page questionnaire. Therefore:
+   - interview metadata, selected demographic fields, ten concern ratings, and follow-up permission use individual native Form mappings;
+   - other detailed answers are grouped by topic in compact, versioned JSON and sent to paragraph fields;
+   - every completed answer that is visible at submission time is retained, not only the summary shown on the page.
+5. `Sections`, `Questions`, `Fields`, `Options`, and `Logic` in the Google Sheet control wording, order, options, required status, and conditional display without a website code change. If remote configuration cannot load, the website uses its reviewed bundled configuration.
+6. Apps Script expands submitted JSON automatically into wide, long, and topic-specific tables plus a codebook.
+7. A user may continue editing a locally saved draft while offline, but submission requires the network connection to be restored.
 
-## 3. 必答与可跳过原则
+No new database is required, and personal responses are not stored in the public repository. The response workbook remains private. The public Apps Script web app exposes questionnaire configuration only and does not read response or analysis tabs.
 
-源问卷说明参与完全自愿、受访者可跳过任何问题。为兼顾这一原则与可用的数据记录，当前只设置以下必答项：
+## 3. Required and optional answers
 
-- Participant ID：只能填项目编号，不应填姓名；
-- Interview date；
-- Interview location；
-- Informed consent；
-- 生产模块选择：玉米、畜牧，或“都不是/不确定”；
-- Z2 是否同意项目未来再次联系。
+The source questionnaire states that participation is voluntary and respondents may skip any question. To balance that principle with a usable response record, only the following items are currently required:
 
-其他题均允许留空。数值提示主要用于发现明显录入错误，不强迫受访者回答未知信息。
+- Participant ID, which must be a project code rather than a name;
+- Interview date;
+- Interview location;
+- Informed consent;
+- Production-module selection: maize, livestock, or neither/not sure;
+- Z2 permission for future project contact.
 
-## 4. 顶层模块路由
+All other questions may be left blank. Numeric checks are mainly intended to detect obvious data-entry errors; they do not force respondents to provide unknown information.
 
-### 4.1 根据 D3 自动建议
+## 4. Top-level module routing
 
-| D3 主要职业 | 自动建议显示的模块 |
+### 4.1 Suggested modules from D3
+
+| D3 main occupation | Suggested module display |
 |---|---|
-| Maize or crop farmer | 玉米模块 |
-| Livestock farmer | 畜牧模块 |
-| Mixed crop and livestock farmer | 玉米 + 畜牧模块 |
-| Other / 未回答 | 不自动选择，由调查员选择 |
+| Maize or crop farmer | Maize module |
+| Livestock farmer | Livestock module |
+| Mixed crop and livestock farmer | Maize and livestock modules |
+| Other or unanswered | No automatic choice; the enumerator selects the appropriate module |
 
-自动结果只是建议。调查员可以手动增减模块，以适应兼业农户或复杂经营类型。
+The automatic result is a suggestion. The enumerator may add or remove modules for mixed livelihoods or more complex farm arrangements.
 
-### 4.2 模块互斥
+### 4.2 Module exclusivity
 
-- 玉米和畜牧可以同时选。
-- “Neither / not sure”与玉米、畜牧互斥。
-- 未选择任何一项时，不能离开 General information 步骤。
-- 被跳过模块中的隐藏输入不会提交；已经填过、随后又取消该模块的内容仍只保存在本机草稿中，重新启用该模块后可以恢复显示。
+- Maize and livestock may be selected together.
+- `Neither / not sure` is mutually exclusive with maize and livestock.
+- The user cannot leave General information until one module choice is made.
+- Inputs inside a skipped module are not submitted. If a completed module is later deselected, its answers remain only in the device draft and reappear if the module is enabled again.
 
-## 5. 通用选项逻辑
+## 5. General option behavior
 
-- 所有带 “Other”的选择题：只有选中 Other 后才展开说明框。
-- 所有带 “None / Not a member / Rainfed only / Sell immediately / Unknown”的互斥选项：选中后会自动取消同组其他项；选择其他项则自动取消互斥项。
-- 所有可重复记录（地块、品种、损失、支持措施等）：未启用的记录不提交其内部字段。
-- 所有问题/事件清单：勾选某项后才展开强度、措施或说明；取消后内部字段不提交。
-- 量表统一用 1–5，网页同时显示两端含义，减少方向录反。
+- For choice questions containing `Other`, the explanation field appears only after `Other` is selected.
+- Exclusive choices such as `None`, `Not a member`, `Rainfed only`, `Sell immediately`, and `Unknown` clear other choices in the same group. Selecting a normal option clears an exclusive option.
+- Repeating records—plots, varieties, losses, support measures, and similar groups—submit only the records that are enabled.
+- For issue or event lists, selecting an item opens its severity, measure, or explanation field. Deselecting it excludes the nested fields from submission.
+- Rating scales use a consistent 1–5 direction and show both endpoint meanings to reduce reversed entries.
 
-## 6. 玉米模块条件逻辑
+## 6. Maize-module conditional logic
 
-| 触发题 | 条件 | 展开的内容 |
+| Trigger question | Condition | Content displayed |
 |---|---|---|
-| M3 经营安排 | Cooperative / Contract / Large plot | 对应名称和合作说明 |
-| M7 土地适宜性 | Not suitable | M7.1 建议改种的作物 |
-| M15 杂草/害虫 | Other | 对应名称 |
-| M20 天气信息使用 | Regularly 或 Occasionally | M20.1 使用场景、信息来源、M20.2 信心评分 |
-| M21 种植体系 | Intercropping / Alley cropping / Agroforestry / Other | 体系组成或说明 |
-| M22 调整农时 | Yes | 调整后的时间和原因 |
-| M22 调整农时 | No | 尚未调整的原因 |
-| M25 更换品种 | Yes | 更换原因 |
-| M27 收获方法 | Other | 方法说明 |
-| M28 采后处理 | Other | 方法说明 |
-| M29 储藏损失 | Yes | 损失原因 |
-| M30 买方 | Other | 买方说明 |
+| M3 farm arrangement | Cooperative, Contract, or Large plot | Relevant name and cooperation details |
+| M7 land suitability | Not suitable | M7.1 suggested alternative crop |
+| M15 weeds or pests | Other | Name of the other issue |
+| M20 weather-information use | Regularly or Occasionally | M20.1 uses and sources; M20.2 confidence rating |
+| M21 production system | Intercropping, Alley cropping, Agroforestry, or Other | System composition or explanation |
+| M22 planting-time adjustment | Yes | Revised timing and reason |
+| M22 planting-time adjustment | No | Reason no adjustment has been made |
+| M25 variety change | Yes | Reason for the change |
+| M27 harvesting method | Other | Method description |
+| M28 post-harvest method | Other | Method description |
+| M29 storage loss | Yes | Cause of loss |
+| M30 buyer | Other | Buyer description |
 
-数值检查：
+Numeric checks:
 
-- 多个玉米地块面积自动合计，仅作录入提示；
-- 玉米品种面积占比总和若超过 100%，阻止提交并要求检查；
-- 含水率限定 0–100%；面积、成本、距离等不允许负数。
+- Areas from multiple maize plots are totalled as a data-entry prompt only.
+- Submission is blocked if maize-variety area shares total more than 100%.
+- Moisture must be between 0% and 100%; area, cost, distance, and similar values cannot be negative.
 
-## 7. 畜牧模块条件逻辑
+## 7. Livestock-module conditional logic
 
-| 触发题 | 条件 | 展开的内容 |
+| Trigger question | Condition | Content displayed |
 |---|---|---|
-| L5 是否中断过养殖 | Yes | 中断时间与原因 |
-| L6 经营安排 | Cooperative / Contract / Large plot / Community enterprise | 对应名称和合作说明 |
-| L6 Contract farming | 选中 | L7 合同方投入或支持 |
-| L13.3 气味/废水投诉 | Yes | 投诉与处理说明 |
-| L23 饲料类型 | Commercial pelleted / ready-made feed | L24 购买饲料品牌/类型记录 |
-| L23 饲料类型 | Self-mixed feed | L25 自配饲料原料记录 |
-| L25.1 自产玉米作饲料 | 同时选择玉米与畜牧模块时显示 | 是否使用及使用比例；只有“Used as feed”再显示比例 |
-| 环境/栏舍问题、疾病、气候事件 | 勾选某项 | 强度、管理措施或影响说明 |
-| L27 生物安全 | Regularly 或 Occasionally | L27.1 具体措施 |
-| L32 天气信息使用 | Regularly 或 Occasionally | L32.1 使用场景、来源、L32.2 信心评分 |
-| L35 更换品种 | Yes | 更换原因 |
+| L5 interruption of livestock production | Yes | Timing and reason |
+| L6 farm arrangement | Cooperative, Contract, Large plot, or Community enterprise | Relevant name and cooperation details |
+| L6 contract farming | Selected | L7 inputs or support from the contracting party |
+| L13.3 odor or wastewater complaint | Yes | Complaint and response details |
+| L23 feed type | Commercial pelleted / ready-made feed | L24 purchased-feed brand/type records |
+| L23 feed type | Self-mixed feed | L25 self-mixed ingredient records |
+| L25.1 own maize used as feed | Both maize and livestock modules selected | Whether it is used and the share used; percentage appears only for `Used as feed` |
+| Environmental, housing, disease, or climate issue | Item selected | Severity, management measure, or impact details |
+| L27 biosecurity | Regularly or Occasionally | L27.1 specific measures |
+| L32 weather-information use | Regularly or Occasionally | L32.1 uses and sources; L32.2 confidence rating |
+| L35 breed change | Yes | Reason for the change |
 
-数值检查：
+Numeric checks:
 
-- 自产与购买饲料占比会显示当前合计，理想值为 100%；考虑受访者可能只知道其中一项，这里只警告、不阻止提交；
-- 畜禽品种占比总和若超过 100%，阻止提交；
-- 死亡率限定 0–100%；数量、成本、距离等不允许负数。
+- Own-produced and purchased feed shares display a running total with an ideal value of 100%. Because respondents may know only one share, this produces a warning but does not block submission.
+- Submission is blocked if livestock-breed shares total more than 100%.
+- Mortality must be between 0% and 100%; counts, costs, distances, and similar values cannot be negative.
 
-## 8. 气候历史与时间逻辑
+## 8. Climate-history and date logic
 
-- A1 和 A2 保留源表的佛历 2564–2568，同时显示公历 2021–2025。
-- A1 每个“年份 × 月份”选择一个降雨等级：极端干旱、干旱、正常、强降雨、异常强降雨。
-- A2 纸表的一个格子可能手写多个灾害，但网页下拉框每格只能选一个“主要灾害”；多个灾害同时发生时，应在 A3 补充说明。这是为了使手机录入可操作且便于分析。
-- A3 最多记录 5 次损失，按严重程度排序，并保留事件、时间、受影响活动、损失量/价值和支持情况。
-- 访谈日期不能晚于填写当天；页面按照设备本地时区生成默认日期。
+- A1 and A2 retain Buddhist Era years 2564–2568 and also display Gregorian years 2021–2025.
+- Each A1 year-month cell accepts one rainfall category: extreme drought, drought, normal, heavy rain, or abnormally heavy rain.
+- The paper A2 grid can contain several handwritten hazards in one cell. For workable mobile entry and simpler analysis, the website accepts one primary hazard per cell. Additional simultaneous hazards should be recorded in A3.
+- A3 supports up to five loss records, ranked by severity, with event, timing, affected activity, quantity or monetary value, and support details.
+- Interview date cannot be later than the current date. The default date uses the device's local time zone.
 
-## 9. 对原英文稿歧义的整理与暂定处理
+## 9. Provisional interpretations of source ambiguities
 
-以下不是源文件明确规定的逻辑，而是为完成可用网页所作的暂定设计，建议项目团队重点审核：
+The following rules were not stated unambiguously in the source file. They are provisional implementation decisions that should receive focused project-team review:
 
-1. **D3 职业选项**：源稿的职业分类存在重叠，整理为 maize/crop、livestock、mixed、other 四类，并另设模块路由。
-2. **D6 教育程度**：将格式不一致的教育选项归并为无正规教育、小学、中学、职业教育、本科及以上。
-3. **泰文残留与翻译痕迹**：仅按上下文做保守英文规范化，不把泰文残留原样展示给农户。
-4. **M21 重复行**：源稿中农林复合/间作相关行有重复，网页整理为 Intercropping、Alley cropping、Agroforestry 三个不同体系。
-5. **M22 选项损坏**：源稿的 Yes/No 及后续字段版式错位；网页推断为 Yes→“如何调整+原因”，No→“未调整原因”。
-6. **M30 “Producers”**：根据“产品交给谁”的语境解释为 Buyers/销售渠道，而不是生产者身份。
-7. **畜牧编号跳跃**：源稿从 L15 跳到 L22，并多次重复 L25/L26。网页保留可识别题号以便对照，但用唯一的数据字段名避免覆盖。
-8. **L15 水评价题**：源稿附近编号缺失，网页暂归为 L15。
-9. **L28 停药期**：源稿没有完整可选项，网页设为 Always follow、Sometimes follow、Do not follow、Do not know 四档。
-10. **L31 月历活动**：源表提供 9 个空白活动行。网页预置繁育、出生、免疫、清洁、降温、饲料、奶蛋收集、销售运输、粪污管理九类常见活动；不适用月份可全留空。
-11. **L45.1 议价能力**：源稿三项文字重复为 “Negotiable”，网页推定为 Fully / Somewhat / Not negotiable。
-12. **L46 农场草图**：静态网页没有配置文件上传后端；暂将草图改为“圈舍/放牧区、水源、粪污区及补充说明”的结构化文本。若草图是研究必需，应另行增加受控的图片存储服务。
-13. **N2 支持**：源文件标题同时包含“已获得”和“最感兴趣”，网页保留一个可排序记录表，并要求调查员在描述中注明 received 或 desired；后续可拆成两题。
-14. **Dindi**：源 DOCX 中的 Dindi 图片和 LINE 二维码链接被保留为可选的补充信息；它不参与本调查数据提交。
+1. **D3 occupation choices:** overlapping source categories were consolidated into maize/crop, livestock, mixed, and other, with a separate module selector.
+2. **D6 education:** inconsistently formatted source choices were consolidated into no formal education, primary, secondary, vocational, and university or above.
+3. **Residual Thai and translation artifacts:** wording was normalized conservatively into English from context instead of displaying unexplained residual Thai text.
+4. **M21 duplicated rows:** overlapping agroforestry/intercropping rows were organized as Intercropping, Alley cropping, and Agroforestry.
+5. **M22 damaged option layout:** the displaced Yes/No and follow-up layout was interpreted as Yes → adjusted timing and reason; No → reason not adjusted.
+6. **M30 `Producers`:** in the context of where products are delivered, it was interpreted as buyers or sales channels rather than producer identity.
+7. **Livestock numbering gaps:** the source jumps from L15 to L22 and repeats L25/L26. Recognizable printed numbers are retained for comparison, while unique data keys prevent overwritten answers.
+8. **L15 water-rating item:** a nearby missing number was provisionally assigned to L15.
+9. **L28 withdrawal-period practice:** because the source lacks complete choices, the website uses Always follow, Sometimes follow, Do not follow, and Do not know.
+10. **L31 activity calendar:** the source provides nine blank activity rows. The website preloads breeding, birth, vaccination, cleaning, cooling, feeding, milk/egg collection, sales/transport, and manure management. Non-applicable months may remain blank.
+11. **L45.1 bargaining power:** three repeated `Negotiable` labels were interpreted as Fully, Somewhat, and Not negotiable.
+12. **L46 farm sketch:** the static website has no approved image-upload backend. The sketch is represented provisionally by structured text for housing/grazing area, water, waste area, and additional notes. If the sketch is essential, an approved controlled image-storage service is required.
+13. **N2 support:** the source heading combines support already received and support of greatest interest. The website uses one ranked record table and asks the enumerator to identify each item as received or desired. This can be split later.
+14. **Dindi:** the Dindi image and LINE QR link from the source DOCX are retained as optional supplementary information and are not included in survey submission data.
 
-## 10. 隐私与现场使用建议
+## 10. Privacy and field-use recommendations
 
-- 页面不收集姓名、电话或邮箱；Participant ID 应对应由项目方单独保管的受控名册。
-- GPS 坐标为可选，只有调查员主动点击按钮并同意浏览器权限后才读取；应在访谈同意范围内使用。
-- 共用手机完成一份访谈后，应点击 “Start a new response” 清除本机草稿；如中途交接设备，应先下载需要的副本并清除草稿。
-- 下载的 JSON 是受访数据，应纳入项目的数据管理和访问控制，不应提交到 GitHub。
-- 公开链接可被任何知道网址的人访问。正式发布前应由项目团队确认问卷公开性、Google Form 的接收状态和响应表权限。
+- The page does not request a name, phone number, or email address. Participant ID should map to a separately controlled project register.
+- Coordinates are optional and are read only after the enumerator presses the button and approves the browser permission. Their use must fall within the interview consent.
+- After completing an interview on a shared device, select `Start a new response` to clear the local draft. Before handing over a partly completed device, download any required copy and clear the draft.
+- Downloaded respondent JSON is survey data and must follow project access and data-management controls. It must not be committed to GitHub.
+- Anyone who knows the public URL can open the questionnaire. Before production release, the project team must approve questionnaire visibility, Google Form receiving status, and response-workbook permissions.
 
-## 11. 建议讨论和确认的问题
+## 11. Questions for project-team confirmation
 
-1. 是否需要泰文、中文或双语界面？由谁审核术语？
-2. M21 的三类体系是否符合研究团队定义？
-3. A2 是否必须支持同一月多选灾害，而不是只选主要灾害？
-4. L28 的四档停药期选项是否适合所有畜禽类型？
-5. L31 的九个预置活动是否应改回调查员自由填写？
-6. L46 是否必须上传手绘图/照片？若需要，批准使用哪一个受控存储后端？
-7. N2 是否拆分为“已获得支持”和“希望获得支持”两题？
-8. 当前自动生成的宽表、长表和专题表是否满足分析流程，还是需要进一步接入关系数据库或统计软件？
-9. 是否需要验证码、访问口令、提交后回执编号或防重复机制？
+1. Is an independently reviewed Thai or bilingual interface required?
+2. Do the three M21 production-system categories match the research team's definitions?
+3. Must A2 support several hazards in the same month instead of one primary hazard?
+4. Are the four L28 withdrawal-period choices suitable for every livestock type?
+5. Should the nine predefined L31 activities return to free-text entry?
+6. Must L46 support a sketch or photo upload, and if so, which controlled storage backend is approved?
+7. Should N2 be split into `support received` and `support desired`?
+8. Do the generated wide, long, and topic tables meet the analysis workflow, or is a database/statistical-system connection required?
+9. Is an access code, CAPTCHA, submission receipt ID, or duplicate-prevention mechanism required?
