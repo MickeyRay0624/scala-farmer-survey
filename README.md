@@ -21,6 +21,7 @@ The site is a static GitHub Pages application. Responses do **not** enter GitHub
 - The original questionnaire at `source/EN_Semi_structured_questionnaire_1Sep.docx`
 - A review record of all inferred rules in `SURVEY_LOGIC.md`
 - An English no-code Google Sheet maintenance guide in `CONFIGURATION_GUIDE.md`
+- A matching Chinese operator guide in `CONFIGURATION_GUIDE_CN.md`
 - A private TEST workbook template plus Apps Script for form creation and JSON analysis
 
 ## Data flow
@@ -66,7 +67,7 @@ The current TEST environment is already installed. Open the private manager Shee
 
 Green cells are intended for routine edits. Technical ID columns are hidden by default; use `SCALA Tools → Show technical columns` only for advanced work, then return to `Use simple editor view`. Changes appear on the TEST site after the remote configuration is refreshed; allow up to five minutes, refresh the page, and submit a labelled QA response.
 
-See `CONFIGURATION_GUIDE.md` for exact column instructions, testing steps, analysis tabs, and safety limits.
+See `CONFIGURATION_GUIDE.md` for the authoritative English instructions, or `CONFIGURATION_GUIDE_CN.md` for the matching Chinese operator guide. Both cover exact columns, testing steps, analysis tabs, and safety limits.
 
 ## Current TEST environment
 
