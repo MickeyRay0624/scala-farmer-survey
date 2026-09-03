@@ -64,13 +64,15 @@ function getSpreadsheet_() {
 }
 
 function notify_(title, message) {
-  const ss = getSpreadsheet_();
   try {
     const ui = SpreadsheetApp.getUi();
     ui.alert(title, message, ui.ButtonSet.OK);
   } catch (error) {
-    ss.toast(message, title, 8);
-    console.log(`${title}: ${message}`);
+    try {
+      getSpreadsheet_().toast(message, title, 8);
+    } catch (toastError) {
+      console.log(`${title}: ${message}`);
+    }
   }
 }
 
@@ -224,7 +226,7 @@ function rebuildAnalysis() {
     resetOutputSheet_('Support_Needs', OUTPUT_HEADERS.Support_Needs, parsedResponses.flatMap((response) => response.supportNeeds));
     refreshCodebook();
     updateSetting_('last_analysis_refresh', new Date());
-    getSpreadsheet_().toast(`Expanded ${parsedResponses.length} TEST response(s).`, 'SCALA analysis', 8);
+    notify_('SCALA analysis', `Expanded ${parsedResponses.length} TEST response(s).`);
   } finally {
     lock.releaseLock();
   }
