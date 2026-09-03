@@ -68,7 +68,7 @@ See `CONFIGURATION_GUIDE_CN.md` for the non-technical workflow and safety limits
 - Apps Script: `google-apps-script/Code.gs`
 - Manifest: `google-apps-script/appsscript.json`
 
-The setup function creates an **unpublished** `[TEST]` Google Form and links it to the private workbook. Publishing is a separate deliberate step. The web endpoint returns configuration only; it never returns form responses or analysis data.
+The setup function creates an **unpublished** `[TEST]` Google Form and links it to the private workbook. Publishing is a separate deliberate step. Publishing also replaces provisional Forms item IDs with the verified `entry.*` IDs required by the public submission endpoint. After changing receiver fields in Google Forms, run `refreshTransportMap()` before resuming collection. The web endpoint returns configuration only; it never returns form responses or analysis data.
 
 ## Local preview
 

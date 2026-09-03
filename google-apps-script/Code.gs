@@ -38,6 +38,7 @@ function onOpen() {
       .createMenu('SCALA Tools')
       .addItem('1 · Create isolated TEST form', 'bootstrapTestEnvironment')
       .addItem('2 · Publish TEST form', 'publishTestForm')
+      .addItem('3 · Verify Google Form field mapping', 'refreshTransportMap')
       .addSeparator()
       .addItem('Rebuild all analysis', 'rebuildAnalysis')
       .addItem('Refresh codebook', 'refreshCodebook')
@@ -118,7 +119,13 @@ function bootstrapTestEnvironment() {
       else if (fieldType === 'date') item = form.addDateItem().setIncludesYear(true);
       else item = form.addTextItem();
       item.setTitle(`[${payloadKey}] ${questionTitle}`).setRequired(false);
-      created.push({ payload_key: payloadKey, entry_id: String(item.getId()), field_type: fieldType, question_title: questionTitle, editor_notes: 'Generated for the isolated TEST receiver.' });
+      created.push({
+        payload_key: payloadKey,
+        entry_id: String(item.getId()),
+        field_type: fieldType,
+        question_title: questionTitle,
+        editor_notes: 'Provisional Forms item ID; the publish step replaces this with the verified submission entry ID.',
+      });
     });
 
     form.setDestination(FormApp.DestinationType.SPREADSHEET, ss.getId());
@@ -152,11 +159,83 @@ function publishTestForm() {
   if (!formId) throw new Error('No TEST form exists yet. Run bootstrapTestEnvironment() first.');
   const form = FormApp.openById(formId);
   if (form.supportsAdvancedResponderPermissions()) form.setPublished(true);
-  form.setAcceptingResponses(true);
-  updateSetting_('submission_enabled', 'TRUE');
+  form.setAcceptingResponses(false);
+  updateSetting_('submission_enabled', 'FALSE');
+  const mappedRows = refreshTransportMap_(form);
   updateSetting_('form_public_url', form.getPublishedUrl());
   updateSetting_('form_action', form.getPublishedUrl().replace(/viewform(?:\?.*)?$/, 'formResponse'));
-  notify_('TEST form published', form.getPublishedUrl());
+  form.setAcceptingResponses(true);
+  updateSetting_('submission_enabled', 'TRUE');
+  notify_('TEST form published', `${form.getPublishedUrl()}\n\nVerified ${mappedRows.length} Google Forms submission field mappings.`);
+}
+
+/**
+ * Rebuilds Transport_Map from Google Forms prefilled URLs. A Form item's
+ * getId() value is not the entry ID accepted by the public formResponse URL.
+ */
+function refreshTransportMap() {
+  const formId = String(getSetting_('form_id') || '').trim();
+  if (!formId) throw new Error('No TEST form exists yet. Run bootstrapTestEnvironment() first.');
+  const form = FormApp.openById(formId);
+  const resumeAccepting = form.isAcceptingResponses();
+  form.setAcceptingResponses(false);
+  updateSetting_('submission_enabled', 'FALSE');
+  try {
+    const mappedRows = refreshTransportMap_(form);
+    if (resumeAccepting) {
+      form.setAcceptingResponses(true);
+      updateSetting_('submission_enabled', 'TRUE');
+    }
+    notify_('Google Form mapping verified', `Verified ${mappedRows.length} submission field mappings.`);
+    return mappedRows;
+  } catch (error) {
+    notify_('Google Form mapping failed', `Submissions remain paused. ${error.message}`);
+    throw error;
+  }
+}
+
+function refreshTransportMap_(form) {
+  const rows = readTable_('Transport_Map');
+  if (!rows.length) throw new Error('Transport_Map is empty.');
+  const itemsByKey = new Map();
+  form.getItems().forEach((item) => {
+    const key = keyFromHeader_(item.getTitle());
+    if (!key) return;
+    if (itemsByKey.has(key)) throw new Error(`Duplicate Google Form payload key: ${key}`);
+    itemsByKey.set(key, item);
+  });
+  const missing = rows.map((row) => String(row.payload_key || '').trim()).filter((key) => key && !itemsByKey.has(key));
+  if (missing.length) throw new Error(`Google Form is missing mapped fields: ${missing.join(', ')}`);
+  const refreshed = rows.map((row) => {
+    const key = String(row.payload_key || '').trim();
+    return {
+      ...row,
+      entry_id: entryIdForItem_(form, itemsByKey.get(key)),
+      editor_notes: 'Verified Google Forms submission entry ID.',
+    };
+  });
+  writeTable_('Transport_Map', refreshed);
+  SpreadsheetApp.flush();
+  return refreshed;
+}
+
+function entryIdForItem_(form, item) {
+  const response = form.createResponse();
+  const marker = `SCALA_MAPPING_${item.getId()}`;
+  let itemResponse;
+  if (item.getType() === FormApp.ItemType.TEXT) {
+    itemResponse = item.asTextItem().createResponse(marker);
+  } else if (item.getType() === FormApp.ItemType.PARAGRAPH_TEXT) {
+    itemResponse = item.asParagraphTextItem().createResponse(marker);
+  } else if (item.getType() === FormApp.ItemType.DATE) {
+    itemResponse = item.asDateItem().createResponse(new Date(2001, 1, 3));
+  } else {
+    throw new Error(`Unsupported Google Form item type for ${item.getTitle()}: ${item.getType()}`);
+  }
+  const prefilledUrl = decodeURIComponent(response.withItemResponse(itemResponse).toPrefilledUrl());
+  const match = prefilledUrl.match(/[?&]entry\.(\d+)(?:_[^=&#]+)?=/);
+  if (!match) throw new Error(`Could not determine the Google Forms entry ID for ${item.getTitle()}.`);
+  return match[1];
 }
 
 function showTestLinks() {

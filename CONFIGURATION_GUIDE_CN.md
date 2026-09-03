@@ -23,7 +23,7 @@
 4. 如果 Google 将脚本打开为独立项目，在 **项目设置 → 脚本属性** 新增 `SCALA_SPREADSHEET_ID`，值为这个测试 Google Sheet 网址中 `/d/` 与 `/edit` 之间的 ID。绑定到 Sheet 的脚本可跳过此步；
 5. 运行一次 `bootstrapTestEnvironment()` 并完成 Google 授权；
 6. 脚本会新建一个名称带 `[TEST]` 的独立 Google Form、把它连接到当前工作簿，并安装表单提交触发器；
-7. 先检查测试表单，再运行 `publishTestForm()`；
+7. 先检查测试表单，再运行 `publishTestForm()`；发布函数会自动把 `Transport_Map` 中的临时问题 ID 替换为 Google Forms 真正接收提交的 `entry.*` ID；
 8. 将 Apps Script 部署为 Web App。它只返回下列配置表，不返回任何原始回答或分析数据：
    - `Settings`
    - `Sections`
@@ -135,6 +135,8 @@
 | `Dashboard` | 汇总指标 | 快速检查响应和展开结果数量 |
 
 新提交会通过安装式 Google Sheet 表单提交触发器自动展开。批量导入、改过字段结构或发现遗漏时，使用 **SCALA Tools → Rebuild all analysis** 重新生成。
+
+如果在 Google Form 编辑器中增加、删除或重建了接收字段，先暂停收集，再运行 **SCALA Tools → 3 · Verify Google Form field mapping**。映射成功后脚本才会恢复原来的接收状态；映射失败时会保持暂停，避免产生只有时间戳的空回复。
 
 ## 6. 上线前测试清单
 
