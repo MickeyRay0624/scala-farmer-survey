@@ -292,7 +292,8 @@
       }
       controls.forEach((control, index) => {
         control.disabled = !enabled;
-        control.required = enabled && required;
+        const usesCustomRequiredGroup = requiredGroup && ["checkbox", "radio"].includes(control.type);
+        control.required = enabled && required && !usesCustomRequiredGroup;
         if (row.placeholder !== undefined && "placeholder" in control) control.placeholder = safeText(row.placeholder);
         if (row.min_value !== undefined && "min" in control) control.min = safeText(row.min_value);
         if (row.max_value !== undefined && "max" in control) control.max = safeText(row.max_value);

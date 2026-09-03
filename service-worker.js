@@ -1,4 +1,4 @@
-const CACHE_NAME = "scala-farmer-survey-v4";
+const CACHE_NAME = "scala-farmer-survey-v5";
 const OFFLINE_ASSETS = [
   "./",
   "./index.html",
