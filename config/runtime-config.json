@@ -7,10 +7,10 @@
       "form_action": "https://docs.google.com/forms/d/e/1FAIpQLSchtHHQcFWIIhSaLELdh1xBC8LXdhgGVe387UPA7qAOmUZgNw/formResponse"
     },
     "test": {
-      "enabled": false,
-      "config_url": "",
-      "form_action": "",
-      "notice": "The independent test receiver has not been connected yet."
+      "enabled": true,
+      "config_url": "https://script.google.com/macros/s/AKfycbx8qtu9c7K6JyxsXPKf_cC3DIXAOx6pzZ1--w-iN2auX1atpr9WQRwMTM0WkawjS76xSA/exec",
+      "form_action": "https://docs.google.com/forms/d/e/1FAIpQLSejxAeRT7OqF3hqSVHR1o7aAck6QGnS07fg5QRcMUi5aORJNg/formResponse",
+      "notice": "TEST mode: submissions are stored only in the independent SCALA test response sheet."
     }
   }
 }
