@@ -1,7 +1,9 @@
 /**
  * SCALA Farmer Survey
- * Bound Google Sheets script for an isolated TEST form, no-code configuration,
- * and automatic expansion of compact JSON responses.
+ * Google Apps Script for an isolated TEST form, no-code configuration, and
+ * automatic expansion of compact JSON responses. It supports both a script
+ * bound to the manager Sheet and a standalone script configured with the
+ * SCALA_SPREADSHEET_ID script property.
  *
  * The public doGet endpoint returns ONLY whitelisted configuration sheets.
  * Farmer responses and analysis sheets are never returned by doGet.
@@ -10,6 +12,7 @@
 const SCALA_CONFIG = Object.freeze({
   headerRow: 4,
   title: '[TEST] SCALA Farmer Survey data receiver',
+  spreadsheetIdProperty: 'SCALA_SPREADSHEET_ID',
   configSheets: ['Settings', 'Sections', 'Questions', 'Fields', 'Options', 'Logic', 'Transport_Map'],
   outputSheets: ['Responses_Wide', 'JSON_Long', 'Maize_Plots', 'Livestock_Breeds', 'Climate_Events', 'Losses', 'Support_Needs'],
   protectedSheetNames: [
@@ -30,15 +33,45 @@ const OUTPUT_HEADERS = Object.freeze({
 });
 
 function onOpen() {
-  SpreadsheetApp.getUi()
-    .createMenu('SCALA Tools')
-    .addItem('1 · Create isolated TEST form', 'bootstrapTestEnvironment')
-    .addItem('2 · Publish TEST form', 'publishTestForm')
-    .addSeparator()
-    .addItem('Rebuild all analysis', 'rebuildAnalysis')
-    .addItem('Refresh codebook', 'refreshCodebook')
-    .addItem('Show TEST links', 'showTestLinks')
-    .addToUi();
+  try {
+    SpreadsheetApp.getUi()
+      .createMenu('SCALA Tools')
+      .addItem('1 · Create isolated TEST form', 'bootstrapTestEnvironment')
+      .addItem('2 · Publish TEST form', 'publishTestForm')
+      .addSeparator()
+      .addItem('Rebuild all analysis', 'rebuildAnalysis')
+      .addItem('Refresh codebook', 'refreshCodebook')
+      .addItem('Show TEST links', 'showTestLinks')
+      .addToUi();
+  } catch (error) {
+    console.log(`SCALA Tools menu is available only to a bound spreadsheet script: ${error.message}`);
+  }
+}
+
+function getSpreadsheet_() {
+  const active = SpreadsheetApp.getActiveSpreadsheet();
+  if (active) return active;
+  const spreadsheetId = String(
+    PropertiesService.getScriptProperties().getProperty(SCALA_CONFIG.spreadsheetIdProperty) || '',
+  ).trim();
+  if (!spreadsheetId) {
+    throw new Error(
+      `This standalone script needs the ${SCALA_CONFIG.spreadsheetIdProperty} script property. `
+      + 'Set it to the TEST manager Google Sheet ID in Project Settings.',
+    );
+  }
+  return SpreadsheetApp.openById(spreadsheetId);
+}
+
+function notify_(title, message) {
+  const ss = getSpreadsheet_();
+  try {
+    const ui = SpreadsheetApp.getUi();
+    ui.alert(title, message, ui.ButtonSet.OK);
+  } catch (error) {
+    ss.toast(message, title, 8);
+    console.log(`${title}: ${message}`);
+  }
 }
 
 /**
@@ -47,10 +80,10 @@ function onOpen() {
  * existing test form recorded in Settings.
  */
 function bootstrapTestEnvironment() {
-  const lock = LockService.getDocumentLock();
+  const lock = LockService.getScriptLock();
   lock.waitLock(30000);
   try {
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const ss = getSpreadsheet_();
     ensureWorkbookStructure_();
     const currentFormId = String(getSetting_('form_id') || '').trim();
     if (currentFormId) {
@@ -101,10 +134,9 @@ function bootstrapTestEnvironment() {
     writeTable_('Transport_Map', created);
     SpreadsheetApp.flush();
 
-    SpreadsheetApp.getUi().alert(
+    notify_(
       'TEST environment created',
       'The TEST form is linked but intentionally unpublished. Review the form, then use SCALA Tools → 2 · Publish TEST form.',
-      SpreadsheetApp.getUi().ButtonSet.OK,
     );
     return { formId: form.getId(), editUrl: form.getEditUrl(), publicUrl, spreadsheetUrl: ss.getUrl() };
   } finally {
@@ -122,17 +154,17 @@ function publishTestForm() {
   updateSetting_('submission_enabled', 'TRUE');
   updateSetting_('form_public_url', form.getPublishedUrl());
   updateSetting_('form_action', form.getPublishedUrl().replace(/viewform(?:\?.*)?$/, 'formResponse'));
-  SpreadsheetApp.getUi().alert('TEST form published', form.getPublishedUrl(), SpreadsheetApp.getUi().ButtonSet.OK);
+  notify_('TEST form published', form.getPublishedUrl());
 }
 
 function showTestLinks() {
   const lines = [
     `Form editor: ${getSetting_('form_edit_url') || 'not created'}`,
     `Responder link: ${getSetting_('form_public_url') || 'not created'}`,
-    `Response sheet: ${getSetting_('response_sheet_url') || SpreadsheetApp.getActiveSpreadsheet().getUrl()}`,
+    `Response sheet: ${getSetting_('response_sheet_url') || getSpreadsheet_().getUrl()}`,
     `Configuration endpoint: ${getSetting_('config_url') || 'deploy this script as a web app'}`,
   ];
-  SpreadsheetApp.getUi().alert('SCALA TEST links', lines.join('\n\n'), SpreadsheetApp.getUi().ButtonSet.OK);
+  notify_('SCALA TEST links', lines.join('\n\n'));
 }
 
 function installSubmitTrigger_(spreadsheet) {
@@ -149,7 +181,7 @@ function installSubmitTrigger_(spreadsheet) {
 /** Installable spreadsheet form-submit trigger. */
 function handleFormSubmit(event) {
   if (!event || !event.range) throw new Error('This function must be run by a spreadsheet form-submit trigger.');
-  const lock = LockService.getDocumentLock();
+  const lock = LockService.getScriptLock();
   lock.waitLock(30000);
   try {
     const sheet = event.range.getSheet();
@@ -166,7 +198,7 @@ function handleFormSubmit(event) {
 
 /** Rebuilds every analysis tab from all linked form-response rows. */
 function rebuildAnalysis() {
-  const lock = LockService.getDocumentLock();
+  const lock = LockService.getScriptLock();
   lock.waitLock(30000);
   try {
     ensureWorkbookStructure_();
@@ -192,7 +224,7 @@ function rebuildAnalysis() {
     resetOutputSheet_('Support_Needs', OUTPUT_HEADERS.Support_Needs, parsedResponses.flatMap((response) => response.supportNeeds));
     refreshCodebook();
     updateSetting_('last_analysis_refresh', new Date());
-    SpreadsheetApp.getActiveSpreadsheet().toast(`Expanded ${parsedResponses.length} TEST response(s).`, 'SCALA analysis', 8);
+    getSpreadsheet_().toast(`Expanded ${parsedResponses.length} TEST response(s).`, 'SCALA analysis', 8);
   } finally {
     lock.releaseLock();
   }
@@ -402,11 +434,12 @@ function resetOutputSheet_(sheetName, headers, rows) {
 
 function ensureWorkbookStructure_() {
   Object.entries(OUTPUT_HEADERS).forEach(([name, headers]) => ensureOutputSheet_(name, headers));
-  if (!SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Codebook')) SpreadsheetApp.getActiveSpreadsheet().insertSheet('Codebook');
+  const ss = getSpreadsheet_();
+  if (!ss.getSheetByName('Codebook')) ss.insertSheet('Codebook');
 }
 
 function ensureOutputSheet_(name, headers) {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = getSpreadsheet_();
   const sheet = ss.getSheetByName(name) || ss.insertSheet(name);
   if (sheet.getLastColumn() < headers.length || sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), 1)).isBlank()) {
     sheet.getRange(1, 1, 1, headers.length).setValues([headers]);
@@ -427,7 +460,7 @@ function styleOutputSheet_(sheet, columnCount) {
 
 function findRawResponseSheets_() {
   const excluded = new Set(SCALA_CONFIG.protectedSheetNames);
-  return SpreadsheetApp.getActiveSpreadsheet().getSheets().filter((sheet) => {
+  return getSpreadsheet_().getSheets().filter((sheet) => {
     if (excluded.has(sheet.getName()) || sheet.getLastColumn() < 2) return false;
     const headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getDisplayValues()[0];
     return headers.some((header) => String(header).startsWith('[participant_id]'));
@@ -455,7 +488,7 @@ function friendlyTitle_(key) {
 }
 
 function readTable_(sheetName) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+  const sheet = getSpreadsheet_().getSheetByName(sheetName);
   if (!sheet || sheet.getLastRow() < SCALA_CONFIG.headerRow) return [];
   const values = sheet.getRange(SCALA_CONFIG.headerRow, 1, sheet.getLastRow() - SCALA_CONFIG.headerRow + 1, sheet.getLastColumn()).getValues();
   const headers = values.shift().map((value) => String(value || '').trim());
@@ -465,7 +498,7 @@ function readTable_(sheetName) {
 }
 
 function writeTable_(sheetName, rows) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(sheetName);
+  const sheet = getSpreadsheet_().getSheetByName(sheetName);
   if (!sheet) throw new Error(`Missing sheet: ${sheetName}`);
   const headers = sheet.getRange(SCALA_CONFIG.headerRow, 1, 1, sheet.getLastColumn()).getDisplayValues()[0].filter(Boolean);
   const startRow = SCALA_CONFIG.headerRow + 1;
@@ -479,7 +512,7 @@ function getSetting_(key) {
 }
 
 function updateSetting_(key, value) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Settings');
+  const sheet = getSpreadsheet_().getSheetByName('Settings');
   if (!sheet) throw new Error('Missing Settings sheet.');
   const rows = readTable_('Settings');
   const index = rows.findIndex((row) => String(row.key) === key);
@@ -491,7 +524,7 @@ function refreshCodebook() {
   const source = readTable_('Fields');
   const headers = ['question_id', 'section_id', 'input_type', 'field_label', 'analysis_type', 'required', 'sensitive', 'enabled', 'notes'];
   const rows = source.map((row) => [row.question_id, row.section_id, row.input_type, row.field_label, row.analysis_type, row.required, row.sensitive, row.enabled, row.editor_notes]);
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const ss = getSpreadsheet_();
   const sheet = ss.getSheetByName('Codebook') || ss.insertSheet('Codebook');
   const headerRow = 4;
   if (sheet.getLastRow() >= headerRow) sheet.getRange(headerRow, 1, Math.max(1, sheet.getLastRow() - headerRow + 1), Math.max(headers.length, sheet.getLastColumn())).clearContent();

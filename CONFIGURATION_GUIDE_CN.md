@@ -20,10 +20,11 @@
 1. 保持整个工作簿为私有文件；不要把包含农户回答的工作簿“发布到网络”；
 2. 打开 **扩展程序 → Apps Script**；
 3. 将 `google-apps-script/Code.gs` 和 `google-apps-script/appsscript.json` 放入该工作簿的 Apps Script 项目；
-4. 运行一次 `bootstrapTestEnvironment()` 并完成 Google 授权；
-5. 脚本会新建一个名称带 `[TEST]` 的独立 Google Form、把它连接到当前工作簿，并安装表单提交触发器；
-6. 先检查测试表单，再运行 `publishTestForm()`；
-7. 将 Apps Script 部署为 Web App。它只返回下列配置表，不返回任何原始回答或分析数据：
+4. 如果 Google 将脚本打开为独立项目，在 **项目设置 → 脚本属性** 新增 `SCALA_SPREADSHEET_ID`，值为这个测试 Google Sheet 网址中 `/d/` 与 `/edit` 之间的 ID。绑定到 Sheet 的脚本可跳过此步；
+5. 运行一次 `bootstrapTestEnvironment()` 并完成 Google 授权；
+6. 脚本会新建一个名称带 `[TEST]` 的独立 Google Form、把它连接到当前工作簿，并安装表单提交触发器；
+7. 先检查测试表单，再运行 `publishTestForm()`；
+8. 将 Apps Script 部署为 Web App。它只返回下列配置表，不返回任何原始回答或分析数据：
    - `Settings`
    - `Sections`
    - `Questions`
@@ -31,7 +32,7 @@
    - `Options`
    - `Logic`
    - `Transport_Map`
-8. 将 Web App 地址写入 `Settings` 的 `config_url`，并连接到网页测试环境。
+9. 将 Web App 地址写入 `Settings` 的 `config_url`，并连接到网页测试环境。
 
 ## 3. 非技术人员日常修改
 
